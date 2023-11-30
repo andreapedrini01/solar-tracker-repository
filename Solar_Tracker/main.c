@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <StepperLib/base_stepper.h>
+#include <stepperLib/top_stepper.h>
 
 /* Graphic library context */
 Graphics_Context g_sContext;
@@ -28,6 +29,9 @@ void text_case_1() {
 void init_motors() {
     //base motor
     init_baseStepper();
+
+    //top motor
+    init_topStepper();
 }
 
 void _graphicsInit()
@@ -77,17 +81,24 @@ void main(void)
 
     _hwInit();
 
-    moveBaseForward(50);
+    /*moveBaseForward(50);
 
-    moveBaseForward(50);
+    moveBaseForward(50);*/
+
+    //moveTopBackward(50);
+    //moveTopForward(50);
 
     //unsigned int index = 0;
 
     while(1){
         //PCM_gotoLPM0();
 
-
-        //__delay_cycles(2000000);
+        moveTopBackward(150);
+        moveBaseBackward(50);
+        __delay_cycles(2000000);
+        moveTopForward(150);
+        moveBaseForward(50);
+        __delay_cycles(2000000);
 
    }
 }

@@ -15,4 +15,4 @@ extern void moveBaseBackward(int steps);
 extern void lock_baseEnable();
 extern void unlock_baseEnable();
 
-#endif /*stepperLib.h*/
+#endif
