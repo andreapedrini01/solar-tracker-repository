@@ -10,9 +10,9 @@
 #include <stepperLib/top_stepper.h>
 
 /* Graphic library context */
-Graphics_Context g_sContext;
+//Graphics_Context g_sContext;
 
-void text_case_0() {
+/*void text_case_0() {
     Graphics_drawStringCentered(&g_sContext, (int8_t *) "--Voltage:",
                                 AUTO_STRING_LENGTH, 64, 15, OPAQUE_TEXT);
     Graphics_drawStringCentered(&g_sContext, (int8_t *) "Current:",
@@ -24,7 +24,7 @@ void text_case_1() {
                                 AUTO_STRING_LENGTH, 64, 15, OPAQUE_TEXT);
     Graphics_drawStringCentered(&g_sContext, (int8_t *) "--Current:",
                                 AUTO_STRING_LENGTH, 64, 30, OPAQUE_TEXT);
-}
+}*/
 
 void init_motors() {
     //base motor
@@ -34,15 +34,15 @@ void init_motors() {
     init_topStepper();
 }
 
-void _graphicsInit()
+/*void _graphicsInit()
 {
-    /* Initializes display */
+    // Initializes display
     Crystalfontz128x128_Init();
 
-    /* Set default screen orientation */
+    // Set default screen orientation
     Crystalfontz128x128_SetOrientation(LCD_ORIENTATION_UP);
 
-    /* Initializes graphics context */
+    // Initializes graphics context
     Graphics_initContext(&g_sContext, &g_sCrystalfontz128x128,
                          &g_sCrystalfontz128x128_funcs);
     Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
@@ -52,7 +52,7 @@ void _graphicsInit()
 
     text_case_0();
 
-}
+}*/
 
 void _hwInit()
 {
@@ -60,14 +60,7 @@ void _hwInit()
     WDT_A_holdTimer();
     Interrupt_disableMaster();
 
-    // Set the core voltage level to VCORE1
-    PCM_setCoreVoltageLevel(PCM_VCORE1);
-
-    // Set 2 flash wait states for Flash bank 0 and 1
-    FlashCtl_setWaitState(FLASH_BANK0, 2);
-    FlashCtl_setWaitState(FLASH_BANK1, 2);
-
-    _graphicsInit();
+    //_graphicsInit();
     init_motors();
 }
 
@@ -81,23 +74,13 @@ void main(void)
 
     _hwInit();
 
-    /*moveBaseForward(50);
-
-    moveBaseForward(50);*/
-
-    //moveTopBackward(50);
-    //moveTopForward(50);
-
-    //unsigned int index = 0;
-
     while(1){
-        //PCM_gotoLPM0();
 
-        moveTopBackward(150);
-        moveBaseBackward(50);
+        moveTopBackward(100);
+        moveBaseBackward(100);
         __delay_cycles(2000000);
-        moveTopForward(150);
-        moveBaseForward(50);
+        moveTopForward(100);
+        moveBaseForward(100);
         __delay_cycles(2000000);
 
    }

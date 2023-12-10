@@ -16,7 +16,7 @@ void init_baseStepper() {
 void stepBaseMotor() {
     // Invia un impulso STEP
         MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, STEP_PIN);
-        __delay_cycles(1); // Aggiungi un piccolo ritardo
+        __delay_cycles(250); //Aggiungi un piccolo ritardo
         MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, STEP_PIN);
 }
 
