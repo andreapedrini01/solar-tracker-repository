@@ -77,14 +77,16 @@ void readAndMove() {
    int avgIntensity = 0;
 
    while (1) {
-       for (int i = 0; i < numSensors; i++) {
+       int i=0;
+       for (i = 0; i < numSensors; i++) {
            ADC14->CTL0 |= ADC14_CTL0_SC; // Start conversion
            while (!(ADC14->IFGR0 & BIT(i))); // Wait for conversion to complete
            sensorValues[i] = ADC14->MEM[i];
        }
 
        avgIntensity = 0;
-       for (int i = 0; i < numSensors; i++) {
+
+       for (i = 0; i < numSensors; i++) {
            avgIntensity += sensorValues[i];
        }
        avgIntensity /= numSensors;
@@ -108,7 +110,7 @@ void readAndMove() {
 
        }
 
-       delayMs(100);
+       __delay_cycles(100);
    }
 }
 
