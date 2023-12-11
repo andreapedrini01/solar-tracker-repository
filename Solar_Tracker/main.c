@@ -32,6 +32,8 @@ void text_case_1() {
 #define horizontalMaxAngle 180
 #define verticalMinAngle 0
 #define verticalMaxAngle 180
+#define MAX_STEPS_X 50
+#define MAX_STEPS_Y 50
 
 void init_motors() {
     //base motor
