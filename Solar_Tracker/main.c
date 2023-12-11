@@ -32,6 +32,8 @@ void text_case_1() {
 #define horizontalMaxAngle 180
 #define verticalMinAngle 0
 #define verticalMaxAngle 180
+#define MAX_STEPS_X 50
+#define MAX_STEPS_Y 50
 
 void init_motors() {
     //base motor
@@ -69,6 +71,10 @@ void _hwInit()
 
     //_graphicsInit();
     init_motors();
+}
+
+int map(int x, int in_min, int in_max, int out_min, int out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 void readAndMove() {
