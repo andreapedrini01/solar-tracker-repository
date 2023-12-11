@@ -9,6 +9,15 @@
 #include <StepperLib/base_stepper.h>
 #include <stepperLib/top_stepper.h>
 
+#define numSensors 4
+#define lightThreshold 500 // Adjust this threshold as needed
+#define horizontalMinAngle 0
+#define horizontalMaxAngle 180
+#define verticalMinAngle 0
+#define verticalMaxAngle 180
+#define MAX_STEPS_X 50
+#define MAX_STEPS_Y 50
+
 /* Graphic library context */
 //Graphics_Context g_sContext;
 
@@ -25,15 +34,6 @@ void text_case_1() {
     Graphics_drawStringCentered(&g_sContext, (int8_t *) "--Current:",
                                 AUTO_STRING_LENGTH, 64, 30, OPAQUE_TEXT);
 }*/
-
-#define numSensors 4
-#define lightThreshold 500 // Adjust this threshold as needed
-#define horizontalMinAngle 0
-#define horizontalMaxAngle 180
-#define verticalMinAngle 0
-#define verticalMaxAngle 180
-#define MAX_STEPS_X 50
-#define MAX_STEPS_Y 50
 
 void init_motors() {
     //base motor
