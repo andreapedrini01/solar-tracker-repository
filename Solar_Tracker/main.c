@@ -105,13 +105,13 @@ void readAndMove() {
            if (horizontalSteps > 0) {
                moveBaseForward(horizontalSteps);
            } else {
-               moveBaseBackward(horizontalSteps*(-1));
+               moveBaseBackward(0 - horizontalSteps);
            }
 
            if (verticalSteps > 0) {
               moveTopForward(verticalSteps);
            } else {
-               moveTopBackward(verticalSteps*(-1));
+               moveTopBackward(0 - verticalSteps);
            }
 
        }
