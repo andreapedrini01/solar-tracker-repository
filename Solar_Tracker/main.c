@@ -26,6 +26,13 @@ void text_case_1() {
                                 AUTO_STRING_LENGTH, 64, 30, OPAQUE_TEXT);
 }*/
 
+#define numSensors 4
+#define lightThreshold 500 // Adjust this threshold as needed
+#define horizontalMinAngle 0
+#define horizontalMaxAngle 180
+#define verticalMinAngle 0
+#define verticalMaxAngle 180
+
 void init_motors() {
     //base motor
     init_baseStepper();
@@ -64,7 +71,46 @@ void _hwInit()
     init_motors();
 }
 
+void readAndMove() {
 
+   int sensorValues[numSensors];
+   int avgIntensity = 0;
+
+   while (1) {
+       for (int i = 0; i < numSensors; i++) {
+           ADC14->CTL0 |= ADC14_CTL0_SC; // Start conversion
+           while (!(ADC14->IFGR0 & BIT(i))); // Wait for conversion to complete
+           sensorValues[i] = ADC14->MEM[i];
+       }
+
+       avgIntensity = 0;
+       for (int i = 0; i < numSensors; i++) {
+           avgIntensity += sensorValues[i];
+       }
+       avgIntensity /= numSensors;
+
+       if (avgIntensity > lightThreshold) {
+           int horizontalSteps = map(sensorValues[1] - sensorValues[0], 0, 1023, 0, MAX_STEPS_X);
+           int verticalSteps = map(sensorValues[3] - sensorValues[2], 0, 1023, 0, MAX_STEPS_Y);
+
+           // Adjust the code below based on your stepper motor control implementation
+           if (horizontalSteps > 0) {
+               moveBaseForward(horizontalSteps);
+           } else {
+               moveBaseBackward(horizontalSteps);
+           }
+
+           if (verticalSteps > 0) {
+              moveTopForward(verticalSteps);
+           } else {
+               moveTopBackward(verticalSteps);
+           }
+
+       }
+
+       delayMs(100);
+   }
+}
 
 /*
  * Main function
