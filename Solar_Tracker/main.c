@@ -83,41 +83,39 @@ void readAndMove() {
    int sensorValues[NUM_SENSORS];
    int i=0;
 
-   while (1) {
-       for (i = 0; i < NUM_SENSORS; i++) {
-           ADC14->CTL0 |= ADC14_CTL0_SC; // Start conversion
-           while (!(ADC14->IFGR0 & BIT(i))); // Wait for conversion to complete
-           sensorValues[i] = ADC14->MEM[i];
-       }
-
-       int avgIntensity = 0;
-
-       for (i = 0; i < NUM_SENSORS; i++) {
-           avgIntensity += sensorValues[i];
-       }
-       avgIntensity /= NUM_SENSORS;
-
-       if (avgIntensity > LIGHT_THRESHOLD) {
-           int horizontalSteps = map(sensorValues[1] - sensorValues[0], 0, 1023, 0, MAX_STEPS_X);
-           int verticalSteps = map(sensorValues[3] - sensorValues[2], 0, 1023, 0, MAX_STEPS_Y);
-
-           // Adjust the code below based on your stepper motor control implementation
-           if (horizontalSteps > 0) {
-               moveBaseForward(horizontalSteps);
-           } else {
-               moveBaseBackward(0 - horizontalSteps);
-           }
-
-           if (verticalSteps > 0) {
-              moveTopForward(verticalSteps);
-           } else {
-               moveTopBackward(0 - verticalSteps);
-           }
-
-       }
-
-       __delay_cycles(100);
+   for (i = 0; i < NUM_SENSORS; i++) {
+       ADC14->CTL0 |= ADC14_CTL0_SC; // Start conversion
+       while (!(ADC14->IFGR0 & BIT(i))); // Wait for conversion to complete
+       sensorValues[i] = ADC14->MEM[i];
    }
+
+   int avgIntensity = 0;
+
+   for (i = 0; i < NUM_SENSORS; i++) {
+       avgIntensity += sensorValues[i];
+   }
+   avgIntensity /= NUM_SENSORS;
+
+   if (avgIntensity > LIGHT_THRESHOLD) {
+       int horizontalSteps = map(sensorValues[1] - sensorValues[0], 0, 1023, 0, MAX_STEPS_X);
+       int verticalSteps = map(sensorValues[3] - sensorValues[2], 0, 1023, 0, MAX_STEPS_Y);
+
+       // control if the motion has to be clockwise or anti-clockwise and send the impulses
+       if (horizontalSteps > 0) {
+           moveBaseForward(horizontalSteps);
+       } else {
+           moveBaseBackward(0 - horizontalSteps);
+           }
+
+       if (verticalSteps > 0) {
+           moveTopForward(verticalSteps);
+       } else {
+           moveTopBackward(0 - verticalSteps);
+           }
+
+   }
+
+   __delay_cycles(100);
 }
 
 /*
@@ -130,11 +128,11 @@ void main(void)
 
     while(1){
 
-        moveTopBackward(100);
-        moveBaseBackward(100);
-        __delay_cycles(2000000);
         moveTopForward(100);
-        moveBaseForward(100);
+        moveBaseBackward(50);
+        __delay_cycles(2000000);
+        moveTopBackward(100);
+        moveBaseForward(50);
         __delay_cycles(2000000);
 
    }
