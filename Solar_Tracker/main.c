@@ -129,10 +129,10 @@ void main(void)
     while(1){
 
         moveTopForward(100);
-        moveBaseBackward(50);
+        moveBaseBackward(100);
         __delay_cycles(2000000);
         moveTopBackward(100);
-        moveBaseForward(50);
+        moveBaseForward(100);
         __delay_cycles(2000000);
 
    }
