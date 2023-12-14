@@ -22,8 +22,11 @@ void stepBaseMotor() {
 
 void moveBase(int steps) {
     if (steps > 0) {
+        // moveBaseForward
         MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, DIR_PIN);
     } else {
+        // moveBaseBackward
+        steps = 0 - steps;
         MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, DIR_PIN);
     }
     // Genera i passi
