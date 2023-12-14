@@ -132,7 +132,7 @@ void main(void)
         moveBaseBackward(100);
         __delay_cycles(2000000);
         moveTopBackward(50);
-        moveBaseForward(100);
+        moveBaseForward(50);
         __delay_cycles(2000000);
 
    }
