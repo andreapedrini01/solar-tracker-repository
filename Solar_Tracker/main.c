@@ -9,6 +9,15 @@
 #include <StepperLib/base_stepper.h>
 #include <stepperLib/top_stepper.h>
 
+#define NUM_SENSORS 4
+#define LIGHT_THRESHOLD 500 // Adjust this threshold as needed
+#define HORIZONTAL_MIN_ANGLE 0
+#define HORIZONTAL_MAX_ANGLE 180
+#define VERTICAL_MIN_ANGLE 0
+#define VERTICAL_MAX_ANGLE 180
+#define MAX_STEPS_X 50
+#define MAX_STEPS_Y 50
+
 /* Graphic library context */
 //Graphics_Context g_sContext;
 
@@ -25,23 +34,6 @@ void text_case_1() {
     Graphics_drawStringCentered(&g_sContext, (int8_t *) "--Current:",
                                 AUTO_STRING_LENGTH, 64, 30, OPAQUE_TEXT);
 }*/
-
-#define numSensors 4
-#define lightThreshold 500 // Adjust this threshold as needed
-#define horizontalMinAngle 0
-#define horizontalMaxAngle 180
-#define verticalMinAngle 0
-#define verticalMaxAngle 180
-#define MAX_STEPS_X 50
-#define MAX_STEPS_Y 50
-
-void init_motors() {
-    //base motor
-    init_baseStepper();
-
-    //top motor
-    init_topStepper();
-}
 
 /*void _graphicsInit()
 {
@@ -63,6 +55,14 @@ void init_motors() {
 
 }*/
 
+void init_motors() {
+    //base motor
+    init_baseStepper();
+
+    //top motor
+    init_topStepper();
+}
+
 void _hwInit()
 {
     // Halting WDT and disabling master interrupts
@@ -73,49 +73,49 @@ void _hwInit()
     init_motors();
 }
 
-int map(int x, int in_min, int in_max, int out_min, int out_max) {
+int map(int x, int in_min, int in_max, int out_min, int out_max)    //function useful in photoresistor algorithm
+{
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 void readAndMove() {
 
-   int sensorValues[numSensors];
+   int sensorValues[NUM_SENSORS];
+   int i=0;
+
+   for (i = 0; i < NUM_SENSORS; i++) {
+       ADC14->CTL0 |= ADC14_CTL0_SC; // Start conversion
+       while (!(ADC14->IFGR0 & BIT(i))); // Wait for conversion to complete
+       sensorValues[i] = ADC14->MEM[i];
+   }
+
    int avgIntensity = 0;
 
-   while (1) {
-       for (int i = 0; i < numSensors; i++) {
-           ADC14->CTL0 |= ADC14_CTL0_SC; // Start conversion
-           while (!(ADC14->IFGR0 & BIT(i))); // Wait for conversion to complete
-           sensorValues[i] = ADC14->MEM[i];
-       }
-
-       avgIntensity = 0;
-       for (int i = 0; i < numSensors; i++) {
-           avgIntensity += sensorValues[i];
-       }
-       avgIntensity /= numSensors;
-
-       if (avgIntensity > lightThreshold) {
-           int horizontalSteps = map(sensorValues[1] - sensorValues[0], 0, 1023, 0, MAX_STEPS_X);
-           int verticalSteps = map(sensorValues[3] - sensorValues[2], 0, 1023, 0, MAX_STEPS_Y);
-
-           // Adjust the code below based on your stepper motor control implementation
-           if (horizontalSteps > 0) {
-               moveBaseForward(horizontalSteps);
-           } else {
-               moveBaseBackward(horizontalSteps*(-1));
-           }
-
-           if (verticalSteps > 0) {
-              moveTopForward(verticalSteps);
-           } else {
-               moveTopBackward(verticalSteps*(-1));
-           }
-
-       }
-
-       delayMs(100);
+   for (i = 0; i < NUM_SENSORS; i++) {
+       avgIntensity += sensorValues[i];
    }
+   avgIntensity /= NUM_SENSORS;
+
+   if (avgIntensity > LIGHT_THRESHOLD) {
+       int horizontalSteps = map(sensorValues[1] - sensorValues[0], 0, 1023, 0, MAX_STEPS_X);
+       int verticalSteps = map(sensorValues[3] - sensorValues[2], 0, 1023, 0, MAX_STEPS_Y);
+
+       // control if the motion has to be clockwise or anti-clockwise and send the impulses
+       if (horizontalSteps > 0) {
+           moveBaseForward(horizontalSteps);
+       } else {
+           moveBaseBackward(0 - horizontalSteps);
+           }
+
+       if (verticalSteps > 0) {
+           moveTopForward(verticalSteps);
+       } else {
+           moveTopBackward(0 - verticalSteps);
+           }
+
+   }
+
+   __delay_cycles(100);
 }
 
 /*
@@ -128,10 +128,10 @@ void main(void)
 
     while(1){
 
-        moveTopBackward(100);
+        moveTopForward(100);
         moveBaseBackward(100);
         __delay_cycles(2000000);
-        moveTopForward(100);
+        moveTopBackward(100);
         moveBaseForward(100);
         __delay_cycles(2000000);
 
