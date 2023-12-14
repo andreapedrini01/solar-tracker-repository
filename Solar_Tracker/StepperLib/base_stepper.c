@@ -28,18 +28,9 @@ void moveBase(int steps) {
     }
     // Genera i passi
     int i;
-    unlock_baseEnable();
     for (i = 0; i < steps; i++) {
         stepBaseMotor();
         __delay_cycles(5000); // Aggiungi un ritardo tra i passi
     }
-    lock_baseEnable();
 }
 
-void lock_baseEnable() {
-    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, ENABLE_PIN);
-}
-
-void unlock_baseEnable() {
-    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, ENABLE_PIN);
-}
