@@ -18,6 +18,9 @@
 #define MAX_STEPS_X 50
 #define MAX_STEPS_Y 50
 
+
+//HIIIIIIIIII
+
 /* Graphic library context */
 //Graphics_Context g_sContext;
 
