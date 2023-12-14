@@ -26,12 +26,14 @@ void moveTop(int steps) {
     } else {
         MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, DIR_PIN);
     }
+    unlock_topEnable();
     // Genera i passi
     int i;
     for (i = 0; i < steps; i++) {
         stepTopMotor();
         __delay_cycles(5000); // Aggiungi un ritardo tra i passi
     }
+    lock_topEnable();
 }
 
 
