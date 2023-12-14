@@ -81,6 +81,7 @@ int map(int x, int in_min, int in_max, int out_min, int out_max)    //function u
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+// test
 void readAndMove() {
 
    int sensorValues[NUM_SENSORS];
@@ -104,17 +105,13 @@ void readAndMove() {
        int verticalSteps = map(sensorValues[3] - sensorValues[2], 0, 1023, 0, MAX_STEPS_Y);
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
-       if (horizontalSteps > 0) {
-           moveBaseForward(horizontalSteps);
-       } else {
-           moveBaseBackward(0 - horizontalSteps);
-           }
+       if (horizontalSteps != 0) {
+           moveBase(horizontalSteps);
+       }
 
-       if (verticalSteps > 0) {
-           moveTopForward(verticalSteps);
-       } else {
-           moveTopBackward(0 - verticalSteps);
-           }
+       if (verticalSteps != 0) {
+           moveTop(verticalSteps);
+       }
 
    }
 

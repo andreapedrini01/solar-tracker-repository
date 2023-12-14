@@ -20,34 +20,20 @@ void stepTopMotor() {
         MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, STEP_PIN);
 }
 
-void moveTopForward(int steps) {
-    // Imposta la direzione in avanti
+void moveTop(int steps) {
+    if (steps > 0) {
+        // moveTopForward
         MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, DIR_PIN);
-
-        // Genera i passi
-        int i;
-        for (i = 0; i < steps; i++) {
-            stepTopMotor();
-            __delay_cycles(5000); // Aggiungi un ritardo tra i passi
-        }
+    } else {
+        // moveTopBackward
+        steps = 0 - steps;
+        MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, DIR_PIN);
+    }
+    // Genera i passi
+    int i;
+    for (i = 0; i < steps; i++) {
+        stepTopMotor();
+        __delay_cycles(5000); // Aggiungi un ritardo tra i passi
+    }
 }
 
-void moveTopBackward(int steps) {
-    // Imposta la direzione all'indietro
-       MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, DIR_PIN);
-
-       // Genera i passi
-       int i;
-       for (i = 0; i < steps; i++) {
-               stepTopMotor();
-                   __delay_cycles(5000); // Aggiungi un ritardo tra i passi
-       }
-}
-
-void lock_topEnable() {
-    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, ENABLE_PIN);
-}
-
-void unlock_topEnable() {
-    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, ENABLE_PIN);
-}
