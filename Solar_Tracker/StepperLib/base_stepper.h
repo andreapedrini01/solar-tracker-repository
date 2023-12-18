@@ -4,7 +4,6 @@
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include "msp.h"
 
-#define ENABLE_PIN GPIO_PIN5  // Specifica il pin per il segnale ENABLE
 #define STEP_PIN GPIO_PIN6  // Specifica il pin per il segnale STEP
 #define DIR_PIN GPIO_PIN7   // Specifica il pin per il segnale DIR
 
