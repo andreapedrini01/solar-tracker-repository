@@ -186,12 +186,12 @@ void main(void)
 
     while(1){
 
-        readAndMove();
-        moveTopForward(100);
-        moveBaseBackward(100);
+        //readAndMove();
+        moveTop(100);
+        moveBase(100);
         __delay_cycles(2000000);
-        moveTopBackward(100);
-        moveBaseForward(100);
+        moveTop(-100);
+        moveBase(-100);
         __delay_cycles(2000000);
 
    }

@@ -9,9 +9,6 @@
 
 extern void init_baseStepper();
 static void stepBaseMotor();
-extern void moveBaseForward(int steps);
-extern void moveBaseBackward(int steps);
-extern void lock_baseEnable();
-extern void unlock_baseEnable();
+extern void moveBase(int steps);
 
 #endif
