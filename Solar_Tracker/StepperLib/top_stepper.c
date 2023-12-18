@@ -7,10 +7,10 @@ void init_topStepper() {
     MAP_WDT_A_holdTimer();
 
     // Configura i pin come output
-    MAP_GPIO_setAsOutputPin(GPIO_PORT_P2, STEP_PIN | DIR_PIN | ENABLE_PIN);
+    MAP_GPIO_setAsOutputPin(GPIO_PORT_P2, STEP_PIN | DIR_PIN);
 
     // Imposta i pin a livello basso iniziale
-    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, STEP_PIN | DIR_PIN | ENABLE_PIN);
+    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, STEP_PIN | DIR_PIN);
 }
 
 void stepTopMotor() {
@@ -42,12 +42,4 @@ void moveTopBackward(int steps) {
                stepTopMotor();
                    __delay_cycles(5000); // Aggiungi un ritardo tra i passi
        }
-}
-
-void lock_topEnable() {
-    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, ENABLE_PIN);
-}
-
-void unlock_topEnable() {
-    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, ENABLE_PIN);
 }
