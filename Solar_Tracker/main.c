@@ -14,12 +14,17 @@
 #define LIGHT_THRESHOLD 300 // Adjust this threshold as needed
 #define MAX_STEPS_X 50
 #define MAX_STEPS_Y 50
+#define HORIZONTAL_MIN_RANGE -90
+#define HORIZONTAL_MAX_RANGE 90
+#define VERTICAL_MIN_RANGE -90
+#define VERTICAL_MAX_RANGE 90
 
 static uint16_t resultsBuffer[NUM_SENSORS];
 int horizontalSteps = 0;
 int verticalSteps = 0;
 int diff1 = 0;
 int diff2 = 0;
+int horizontalPos = 0, verticalPos = 0;
 
 
 /* Graphic library context */
@@ -162,15 +167,19 @@ void readAndMove() {
            verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
        }
 
-       // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
-           moveBase(horizontalSteps);
+           if ((horizontalPos + horizontalSteps <= HORIZONTAL_MAX_RANGE) && (horizontalPos + horizontalSteps >= HORIZONTAL_MIN_RANGE)){
+               moveBase(horizontalSteps);
+               horizontalPos += horizontalSteps;
+           }
        }
 
        if (verticalSteps != 0) {
-           moveTop(verticalSteps);
+           if (((verticalPos + verticalSteps) <= VERTICAL_MAX_RANGE) && ((verticalPos + verticalSteps) >= VERTICAL_MIN_RANGE)){
+               moveTop(verticalSteps);
+               verticalPos += verticalSteps;
+           }
        }
-
    }
 
    __delay_cycles(100);
