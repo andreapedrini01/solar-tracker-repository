@@ -9,7 +9,6 @@
 
 extern void init_topStepper();
 static void stepTopMotor();
-extern void moveTopForward(int steps);
-extern void moveTopBackward(int steps);
+extern void moveTop(int steps);
 
 #endif

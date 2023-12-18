@@ -10,15 +10,17 @@
 #include <stepperLib/top_stepper.h>
 
 #define NUM_SENSORS 4
-#define LIGHT_THRESHOLD 500 // Adjust this threshold as needed
-#define HORIZONTAL_MIN_ANGLE 0
-#define HORIZONTAL_MAX_ANGLE 180
-#define VERTICAL_MIN_ANGLE 0
-#define VERTICAL_MAX_ANGLE 180
+#define VALUE_CHANGE 60
+#define LIGHT_THRESHOLD 300 // Adjust this threshold as needed
 #define MAX_STEPS_X 50
 #define MAX_STEPS_Y 50
 
-static uint16_t resultsBuffer[4];
+static uint16_t resultsBuffer[NUM_SENSORS];
+int horizontalSteps = 0;
+int verticalSteps = 0;
+int diff1 = 0;
+int diff2 = 0;
+
 
 /* Graphic library context */
 //Graphics_Context g_sContext;
@@ -95,14 +97,6 @@ void _adcInit(){
                                 ADC_VREFPOS_AVCC_VREFNEG_VSS,
                                 ADC_INPUT_A1, ADC_NONDIFFERENTIAL_INPUTS);
 
-        /* Enabling the interrupt when a conversion on channel 1 (end of sequence)
-         *  is complete and enabling conversions */
-        //ADC14_enableInterrupt(ADC_INT1);
-
-        /* Enabling Interrupts */
-        //Interrupt_enableInterrupt(INT_ADC14);
-        //Interrupt_enableMaster();
-
         /* Setting up the sample timer to automatically step through the sequence
          * convert.
          */
@@ -131,38 +125,51 @@ int map(int x, int in_min, int in_max, int out_min, int out_max)    //function u
 
 void readAndMove() {
 
-   int sensorValues[NUM_SENSORS];
    int i=0;
 
-   for (i = 0; i < NUM_SENSORS; i++) {
-       ADC14->CTL0 |= ADC14_CTL0_SC; // Start conversion
-       while (!(ADC14->IFGR0 & BIT(i))); // Wait for conversion to complete
-       sensorValues[i] = ADC14->MEM[i];
+   /* ADC_MEM1 conversion completed */
+  if(ADC_INT1)
+       {
+       /* Store ADC14 conversion results */
+       resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
+       resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
+       resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
+       resultsBuffer[3] = ADC14_getResult(ADC_MEM3);
+
+       /*printf("PR1: %5d\n", resultsBuffer[0]);
+       printf("PR2: %5d\n", resultsBuffer[1]);
+       printf("PR3: %5d\n", resultsBuffer[2]);
+       printf("PR4: %5d\n\n", resultsBuffer[3]);*/
    }
 
    int avgIntensity = 0;
 
    for (i = 0; i < NUM_SENSORS; i++) {
-       avgIntensity += sensorValues[i];
+       avgIntensity += resultsBuffer[i];
    }
    avgIntensity /= NUM_SENSORS;
 
    if (avgIntensity > LIGHT_THRESHOLD) {
-       int horizontalSteps = map(sensorValues[1] - sensorValues[0], 0, 1023, 0, MAX_STEPS_X);
-       int verticalSteps = map(sensorValues[3] - sensorValues[2], 0, 1023, 0, MAX_STEPS_Y);
+       diff1 = resultsBuffer[1] - resultsBuffer[0];
+       /* See if there's an actual change in the value */
+       if (abs(diff1) >= VALUE_CHANGE) {
+           horizontalSteps = map(diff1, 0, 16383, 0, MAX_STEPS_X);
+       }
+       diff2 = resultsBuffer[3] - resultsBuffer[2];
+
+       /* See if there's an actual change in the value */
+       if (abs(diff2) >= VALUE_CHANGE) {
+           verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
+       }
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
-       if (horizontalSteps > 0) {
-           moveBaseForward(horizontalSteps);
-       } else {
-           moveBaseBackward(0 - horizontalSteps);
-           }
+       if (horizontalSteps != 0) {
+           moveBase(horizontalSteps);
+       }
 
-       if (verticalSteps > 0) {
-           moveTopForward(verticalSteps);
-       } else {
-           moveTopBackward(0 - verticalSteps);
-           }
+       if (verticalSteps != 0) {
+           moveTop(verticalSteps);
+       }
 
    }
 
@@ -179,38 +186,14 @@ void main(void)
 
     while(1){
 
-    /* ADC_MEM1 conversion completed */
-        if(ADC_INT1)
-        {
-            /* Store ADC14 conversion results */
-            resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
-            resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
-            resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
-            resultsBuffer[3] = ADC14_getResult(ADC_MEM3);
+        readAndMove();
 
-            /*printf("PR1: %5d\n", resultsBuffer[0]);
-            printf("PR2: %5d\n", resultsBuffer[1]);
-            printf("PR3: %5d\n", resultsBuffer[2]);
-            printf("PR4: %5d\n\n", resultsBuffer[3]);*/
-        }
-
-        moveTopForward(100);
-        moveBaseBackward(100);
+        /*moveTop(100);
+        moveBase(100);
         __delay_cycles(2000000);
-        moveTopBackward(100);
-        moveBaseForward(100);
-        __delay_cycles(2000000);
+        moveTop(-100);
+        moveBase(-100);
+        __delay_cycles(2000000);*/
 
    }
 }
-
-/*void ADC14_IRQHandler(void)
-{
-    uint64_t status;
-
-    status = ADC14_getEnabledInterruptStatus();
-
-
-
-    ADC14_clearInterruptFlag(status);
-}*/
