@@ -18,8 +18,8 @@
 #define MAX_STEPS_X 50
 #define MAX_STEPS_Y 50
 
+static uint16_t resultsBuffer[4];
 
-//HIIIIIIIIII
 
 /* Graphic library context */
 //Graphics_Context g_sContext;
@@ -66,6 +66,54 @@ void init_motors() {
     init_topStepper();
 }
 
+void _adcInit(){
+    /* Configures Pin 6.0 and 4.4 as ADC input */
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN2, GPIO_TERTIARY_MODULE_FUNCTION);
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN1, GPIO_TERTIARY_MODULE_FUNCTION);
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN0, GPIO_TERTIARY_MODULE_FUNCTION);
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN4, GPIO_TERTIARY_MODULE_FUNCTION);
+
+        /* Initializing ADC (ADCOSC/64/8) */
+        ADC14_enableModule();
+        ADC14_initModule(ADC_CLOCKSOURCE_ADCOSC, ADC_PREDIVIDER_64, ADC_DIVIDER_8, 0);
+
+        /* Configuring ADC Memory (ADC_MEM0 - ADC_MEM1 (A15, A9)  with repeat)
+             * with internal 2.5v reference */
+        ADC14_configureMultiSequenceMode(ADC_MEM0, ADC_MEM3, true);
+        ADC14_configureConversionMemory(ADC_MEM0,
+                ADC_VREFPOS_AVCC_VREFNEG_VSS,
+                ADC_INPUT_A3, ADC_NONDIFFERENTIAL_INPUTS);
+
+        ADC14_configureConversionMemory(ADC_MEM1,
+                ADC_VREFPOS_AVCC_VREFNEG_VSS,
+                ADC_INPUT_A4, ADC_NONDIFFERENTIAL_INPUTS);
+
+        ADC14_configureConversionMemory(ADC_MEM2,
+                        ADC_VREFPOS_AVCC_VREFNEG_VSS,
+                        ADC_INPUT_A5, ADC_NONDIFFERENTIAL_INPUTS);
+
+        ADC14_configureConversionMemory(ADC_MEM3,
+                                ADC_VREFPOS_AVCC_VREFNEG_VSS,
+                                ADC_INPUT_A1, ADC_NONDIFFERENTIAL_INPUTS);
+
+        /* Enabling the interrupt when a conversion on channel 1 (end of sequence)
+         *  is complete and enabling conversions */
+        //ADC14_enableInterrupt(ADC_INT1);
+
+        /* Enabling Interrupts */
+        //Interrupt_enableInterrupt(INT_ADC14);
+        //Interrupt_enableMaster();
+
+        /* Setting up the sample timer to automatically step through the sequence
+         * convert.
+         */
+        ADC14_enableSampleTimer(ADC_AUTOMATIC_ITERATION);
+
+        /* Triggering the start of the sample */
+        ADC14_enableConversion();
+        ADC14_toggleConversionTrigger();
+}
+
 void _hwInit()
 {
     // Halting WDT and disabling master interrupts
@@ -74,6 +122,7 @@ void _hwInit()
 
     //_graphicsInit();
     init_motors();
+    _adcInit();
 }
 
 int map(int x, int in_min, int in_max, int out_min, int out_max)    //function useful in photoresistor algorithm
@@ -81,7 +130,6 @@ int map(int x, int in_min, int in_max, int out_min, int out_max)    //function u
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-// test
 void readAndMove() {
 
    int sensorValues[NUM_SENSORS];
@@ -128,12 +176,38 @@ void main(void)
 
     while(1){
 
+    /* ADC_MEM1 conversion completed */
+        if(ADC_INT1)
+        {
+            /* Store ADC14 conversion results */
+            resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
+            resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
+            resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
+            resultsBuffer[3] = ADC14_getResult(ADC_MEM3);
+
+            /*printf("PR1: %5d\n", resultsBuffer[0]);
+            printf("PR2: %5d\n", resultsBuffer[1]);
+            printf("PR3: %5d\n", resultsBuffer[2]);
+            printf("PR4: %5d\n\n", resultsBuffer[3]);*/
+        }
+
         moveTopForward(100);
         moveBaseBackward(100);
         __delay_cycles(2000000);
-        moveTopBackward(50);
-        moveBaseForward(50);
+        moveTopBackward(100);
+        moveBaseForward(100);
         __delay_cycles(2000000);
 
    }
 }
+
+/*void ADC14_IRQHandler(void)
+{
+    uint64_t status;
+
+    status = ADC14_getEnabledInterruptStatus();
+
+
+
+    ADC14_clearInterruptFlag(status);
+}*/
