@@ -95,14 +95,6 @@ void _adcInit(){
                                 ADC_VREFPOS_AVCC_VREFNEG_VSS,
                                 ADC_INPUT_A1, ADC_NONDIFFERENTIAL_INPUTS);
 
-        /* Enabling the interrupt when a conversion on channel 1 (end of sequence)
-         *  is complete and enabling conversions */
-        //ADC14_enableInterrupt(ADC_INT1);
-
-        /* Enabling Interrupts */
-        //Interrupt_enableInterrupt(INT_ADC14);
-        //Interrupt_enableMaster();
-
         /* Setting up the sample timer to automatically step through the sequence
          * convert.
          */
@@ -203,14 +195,3 @@ void main(void)
 
    }
 }
-
-/*void ADC14_IRQHandler(void)
-{
-    uint64_t status;
-
-    status = ADC14_getEnabledInterruptStatus();
-
-
-
-    ADC14_clearInterruptFlag(status);
-}*/
