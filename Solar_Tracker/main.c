@@ -10,10 +10,10 @@
 #include <stepperLib/top_stepper.h>
 
 #define NUM_SENSORS 4
-#define VALUE_CHANGE 60
+#define VALUE_CHANGE 70
 #define LIGHT_THRESHOLD 300 // Adjust this threshold as needed
-#define MAX_STEPS_X 50
-#define MAX_STEPS_Y 50
+#define MAX_STEPS_X 100
+#define MAX_STEPS_Y 100
 
 static uint16_t resultsBuffer[NUM_SENSORS];
 int horizontalSteps = 0;
@@ -150,7 +150,7 @@ void readAndMove() {
    avgIntensity /= NUM_SENSORS;
 
    if (avgIntensity > LIGHT_THRESHOLD) {
-       diff1 = resultsBuffer[1] - resultsBuffer[0];
+       diff1 = resultsBuffer[2] - resultsBuffer[3];
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
            horizontalSteps = map(diff1, 0, 16383, 0, MAX_STEPS_X);
@@ -170,6 +170,13 @@ void readAndMove() {
        if (verticalSteps != 0) {
            moveTop(verticalSteps);
        }
+
+       int delay = 0;
+       if(horizontalSteps > verticalSteps)
+           delay = horizontalSteps;
+       else delay = verticalSteps;
+       for (i = 0; i < delay; i++)
+           __delay_cycles(BASE_STEP_DELAY);
 
    }
 

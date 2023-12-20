@@ -33,6 +33,6 @@ void moveBase(int steps) {
     int i;
     for (i = 0; i < steps; i++) {
         stepBaseMotor();
-        __delay_cycles(5000); // Aggiungi un ritardo tra i passi
+        __delay_cycles(BASE_STEP_DELAY); // Aggiungi un ritardo tra i passi
     }
 }
