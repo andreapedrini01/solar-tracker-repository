@@ -15,6 +15,9 @@
 #define MAX_STEPS_X 100
 #define MAX_STEPS_Y 100
 
+#define MOVIMENTO 3000
+#define MAX_MOVIMENTO 5000
+
 static uint16_t resultsBuffer[NUM_SENSORS];
 int horizontalSteps = 0;
 int verticalSteps = 0;
@@ -155,12 +158,13 @@ void readAndMove() {
        if (abs(diff1) >= VALUE_CHANGE) {
            horizontalSteps = map(diff1, 0, 16383, 0, MAX_STEPS_X);
        }
-       diff2 = resultsBuffer[3] - resultsBuffer[2];
 
+       diff2 = resultsBuffer[3] - resultsBuffer[2];
        /* See if there's an actual change in the value */
        if (abs(diff2) >= VALUE_CHANGE) {
            verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
        }
+       //verticalSteps = 0; //REMEMBER TO CHANGE
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
@@ -171,15 +175,22 @@ void readAndMove() {
            moveTop(verticalSteps);
        }
 
-       int delay = 0;
+       int maxSteps = 0;
        if(horizontalSteps > verticalSteps)
-           delay = horizontalSteps;
-       else delay = verticalSteps;
-       for (i = 0; i < delay; i++)
-           __delay_cycles(BASE_STEP_DELAY);
-
+           maxSteps = horizontalSteps;
+       else maxSteps = verticalSteps;
+       for (i = 0; i < maxSteps; i++) {
+           if(maxSteps - i < FINAL_STEPS) {
+               puts("SLOWER DELAY");
+               __delay_cycles(SLOWER_DELAY);
+           }
+           else {
+               puts("FASTER DELAY");
+               __delay_cycles(FASTER_DELAY);
+           }
+       }
    }
-
+   puts("-------------");
    __delay_cycles(100);
 }
 
@@ -191,16 +202,36 @@ void main(void)
 
     _hwInit();
 
+    //moveTop(-500);
+
+    int counter = 0;
+    int i=0;
+
+   while(i < 2) {
+    if(counter + MOVIMENTO <= 5000) {
+        counter += MOVIMENTO;
+        moveTop(MOVIMENTO);
+    } else {
+        int diff = abs(counter - MAX_MOVIMENTO);
+        counter += diff;
+        moveTop(diff);
+    }
+    i++;
+    __delay_cycles(2000000);
+   }
+
+   moveTop(-counter);
+
     while(1){
 
-        readAndMove();
+        //readAndMove();
 
-        /*moveTop(100);
-        moveBase(100);
-        __delay_cycles(2000000);
-        moveTop(-100);
-        moveBase(-100);
-        __delay_cycles(2000000);*/
+        //moveTop(3000);
+        //moveBase(10);
+        //__delay_cycles(2000000);
+        //moveTop(-3000);
+        //moveBase(-10);
+        //__delay_cycles(2000000);
 
    }
 }
