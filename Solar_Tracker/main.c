@@ -164,7 +164,7 @@ void readAndMove() {
        if (abs(diff2) >= VALUE_CHANGE) {
            verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
        }
-       //verticalSteps = 0; //REMEMBER TO CHANGE
+       verticalSteps = 0; //REMEMBER TO CHANGE
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
@@ -201,10 +201,11 @@ void main(void)
 {
 
     _hwInit();
+    moveTop(5000);
+    moveTop(-10000);
+    moveTop(5000);
 
-    //moveTop(-500);
-
-    int counter = 0;
+    /*int counter = 0;
     int i=0;
 
    while(i < 2) {
@@ -220,17 +221,18 @@ void main(void)
     __delay_cycles(2000000);
    }
 
-   moveTop(-counter);
+   moveTop(-counter);*/
 
     while(1){
 
-        //readAndMove();
+        readAndMove();
+
 
         //moveTop(3000);
-        //moveBase(10);
+        //moveBase(30);
         //__delay_cycles(2000000);
         //moveTop(-3000);
-        //moveBase(-10);
+        //moveBase(-30);
         //__delay_cycles(2000000);
 
    }

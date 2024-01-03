@@ -7,27 +7,27 @@ void init_baseStepper() {
     MAP_WDT_A_holdTimer();
 
     // Configura i pin come output
-    MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, STEP_PIN | DIR_PIN);
+    MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, BASE_STEP_PIN | BASE_DIR_PIN);
 
     // Imposta i pin a livello basso iniziale
-    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, STEP_PIN | DIR_PIN);
+    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, BASE_STEP_PIN | BASE_DIR_PIN);
 }
 
 void stepBaseMotor() {
     // Invia un impulso STEP
-        MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, STEP_PIN);
+        MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, BASE_STEP_PIN);
         __delay_cycles(250); //Aggiungi un piccolo ritardo
-        MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, STEP_PIN);
+        MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, BASE_STEP_PIN);
 }
 
 void moveBase(int steps) {
     if (steps > 0) {
         // moveBaseForward
-        MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, DIR_PIN);
+        MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, BASE_DIR_PIN);
     } else {
         // moveBaseBackward
         steps = 0 - steps;
-        MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, DIR_PIN);
+        MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, BASE_DIR_PIN);
     }
     // Genera i passi
     int i;
