@@ -16,7 +16,7 @@ void init_baseStepper() {
 void stepBaseMotor() {
     // Invia un impulso STEP
         MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, BASE_STEP_PIN);
-        __delay_cycles(250); //Aggiungi un piccolo ritardo
+        __delay_cycles(5000); //Aggiungi un piccolo ritardo
         MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, BASE_STEP_PIN);
 }
 
@@ -33,8 +33,9 @@ void moveBase(int steps) {
     int i;
     for (i = 0; i < steps; i++) {
         stepBaseMotor();
-        if(steps - i < FINAL_STEPS)
+        __delay_cycles(250); // Aggiungi un ritardo tra i passi
+        /*if(steps - i < FINAL_STEPS)
             __delay_cycles(SLOWER_DELAY); // Aggiungi un ritardo tra i passi
-        else __delay_cycles(FASTER_DELAY);
+        else __delay_cycles(FASTER_DELAY);*/
     }
 }

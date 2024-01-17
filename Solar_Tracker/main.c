@@ -123,7 +123,7 @@ void _hwInit()
 
 int map(int x, int in_min, int in_max, int out_min, int out_max)    //function useful in photoresistor algorithm
 {
-  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  return ( (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min) * 100;
 }
 
 void readAndMove() {
@@ -153,18 +153,18 @@ void readAndMove() {
    avgIntensity /= NUM_SENSORS;
 
    if (avgIntensity > LIGHT_THRESHOLD) {
-       diff1 = resultsBuffer[2] - resultsBuffer[3];
+       diff1 = resultsBuffer[3] - resultsBuffer[2];
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
            horizontalSteps = map(diff1, 0, 16383, 0, MAX_STEPS_X);
        }
 
-       diff2 = resultsBuffer[3] - resultsBuffer[2];
+       diff2 = resultsBuffer[0] - resultsBuffer[1];
        /* See if there's an actual change in the value */
        if (abs(diff2) >= VALUE_CHANGE) {
            verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
        }
-       verticalSteps = 0; //REMEMBER TO CHANGE
+       //verticalSteps = 0; //REMEMBER TO CHANGE
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
@@ -182,11 +182,11 @@ void readAndMove() {
        for (i = 0; i < maxSteps; i++) {
            if(maxSteps - i < FINAL_STEPS) {
                puts("SLOWER DELAY");
-               __delay_cycles(SLOWER_DELAY);
+               //__delay_cycles(SLOWER_DELAY);
            }
            else {
                puts("FASTER DELAY");
-               __delay_cycles(FASTER_DELAY);
+               //__delay_cycles(FASTER_DELAY);
            }
        }
    }
@@ -201,10 +201,8 @@ void main(void)
 {
 
     _hwInit();
-    moveTop(5000);
-    moveTop(-10000);
-    moveTop(5000);
 
+    //MOVEMENT THRESHSOLD CHECK
     /*int counter = 0;
     int i=0;
 
