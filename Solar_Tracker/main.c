@@ -10,13 +10,13 @@
 #include <stepperLib/top_stepper.h>
 
 #define NUM_SENSORS 4
-#define VALUE_CHANGE 60
+#define VALUE_CHANGE 70
 #define LIGHT_THRESHOLD 300 // Adjust this threshold as needed
 #define MAX_STEPS_X 50
 #define MAX_STEPS_Y 50
-#define HORIZONTAL_MIN_RANGE -90
-#define HORIZONTAL_MAX_RANGE 90
-#define VERTICAL_MIN_RANGE -90
+
+#define MOVIMENTO 3000
+#define MAX_MOVIMENTO 5000
 #define VERTICAL_MAX_RANGE 90
 
 static uint16_t resultsBuffer[NUM_SENSORS];
@@ -125,7 +125,7 @@ void _hwInit()
 
 int map(int x, int in_min, int in_max, int out_min, int out_max)    //function useful in photoresistor algorithm
 {
-  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  return ( (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min) * 100;
 }
 
 void readAndMove() {
@@ -155,17 +155,18 @@ void readAndMove() {
    avgIntensity /= NUM_SENSORS;
 
    if (avgIntensity > LIGHT_THRESHOLD) {
-       diff1 = resultsBuffer[1] - resultsBuffer[0];
+       diff1 = resultsBuffer[3] - resultsBuffer[2];
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
            horizontalSteps = map(diff1, 0, 16383, 0, MAX_STEPS_X);
        }
-       diff2 = resultsBuffer[3] - resultsBuffer[2];
 
+       diff2 = resultsBuffer[0] - resultsBuffer[1];
        /* See if there's an actual change in the value */
        if (abs(diff2) >= VALUE_CHANGE) {
            verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
        }
+       //verticalSteps = 0; //REMEMBER TO CHANGE
 
        if (horizontalSteps != 0) {
            if ((horizontalPos + horizontalSteps <= HORIZONTAL_MAX_RANGE) && (horizontalPos + horizontalSteps >= HORIZONTAL_MIN_RANGE)){
@@ -180,8 +181,22 @@ void readAndMove() {
                verticalPos += verticalSteps;
            }
        }
+       int maxSteps = 0;
+       if(horizontalSteps > verticalSteps)
+           maxSteps = horizontalSteps;
+       else maxSteps = verticalSteps;
+       for (i = 0; i < maxSteps; i++) {
+           if(maxSteps - i < FINAL_STEPS) {
+               puts("SLOWER DELAY");
+               //__delay_cycles(SLOWER_DELAY);
+           }
+           else {
+               puts("FASTER DELAY");
+               //__delay_cycles(FASTER_DELAY);
+           }
+       }
    }
-
+   puts("-------------");
    __delay_cycles(100);
 }
 
@@ -193,16 +208,36 @@ void main(void)
 
     _hwInit();
 
+    //MOVEMENT THRESHSOLD CHECK
+    /*int counter = 0;
+    int i=0;
+
+   while(i < 2) {
+    if(counter + MOVIMENTO <= 5000) {
+        counter += MOVIMENTO;
+        moveTop(MOVIMENTO);
+    } else {
+        int diff = abs(counter - MAX_MOVIMENTO);
+        counter += diff;
+        moveTop(diff);
+    }
+    i++;
+    __delay_cycles(2000000);
+   }
+
+   moveTop(-counter);*/
+
     while(1){
 
         readAndMove();
 
-        /*moveTop(100);
-        moveBase(100);
-        __delay_cycles(2000000);
-        moveTop(-100);
-        moveBase(-100);
-        __delay_cycles(2000000);*/
+
+        //moveTop(3000);
+        //moveBase(30);
+        //__delay_cycles(2000000);
+        //moveTop(-3000);
+        //moveBase(-30);
+        //__delay_cycles(2000000);
 
    }
 }
