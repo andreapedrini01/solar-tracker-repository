@@ -4,15 +4,14 @@
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include "msp.h"
 
-#define ENABLE_PIN GPIO_PIN5  // Specifica il pin per il segnale ENABLE
-#define STEP_PIN GPIO_PIN6  // Specifica il pin per il segnale STEP
-#define DIR_PIN GPIO_PIN7   // Specifica il pin per il segnale DIR
+#define BASE_STEP_PIN GPIO_PIN6  // Specifica il pin per il segnale STEP
+#define BASE_DIR_PIN GPIO_PIN7   // Specifica il pin per il segnale DIR
+#define SLOWER_DELAY 90000
+#define FASTER_DELAY 45000
+#define FINAL_STEPS 5
 
 extern void init_baseStepper();
 static void stepBaseMotor();
-extern void moveBaseForward(int steps);
-extern void moveBaseBackward(int steps);
-extern void lock_baseEnable();
-extern void unlock_baseEnable();
+extern void moveBase(int steps);
 
 #endif

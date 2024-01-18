@@ -10,10 +10,13 @@
 #include <stepperLib/top_stepper.h>
 
 #define NUM_SENSORS 4
-#define VALUE_CHANGE 40
+#define VALUE_CHANGE 70
 #define LIGHT_THRESHOLD 300 // Adjust this threshold as needed
-#define MAX_STEPS_X 50
-#define MAX_STEPS_Y 50
+#define MAX_STEPS_X 100
+#define MAX_STEPS_Y 100
+
+#define MOVIMENTO 3000
+#define MAX_MOVIMENTO 5000
 
 static uint16_t resultsBuffer[NUM_SENSORS];
 int horizontalSteps = 0;
@@ -97,14 +100,6 @@ void _adcInit(){
                                 ADC_VREFPOS_AVCC_VREFNEG_VSS,
                                 ADC_INPUT_A1, ADC_NONDIFFERENTIAL_INPUTS);
 
-        /* Enabling the interrupt when a conversion on channel 1 (end of sequence)
-         *  is complete and enabling conversions */
-        //ADC14_enableInterrupt(ADC_INT1);
-
-        /* Enabling Interrupts */
-        //Interrupt_enableInterrupt(INT_ADC14);
-        //Interrupt_enableMaster();
-
         /* Setting up the sample timer to automatically step through the sequence
          * convert.
          */
@@ -128,7 +123,7 @@ void _hwInit()
 
 int map(int x, int in_min, int in_max, int out_min, int out_max)    //function useful in photoresistor algorithm
 {
-  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  return ( (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min) * 100;
 }
 
 void readAndMove() {
@@ -158,17 +153,18 @@ void readAndMove() {
    avgIntensity /= NUM_SENSORS;
 
    if (avgIntensity > LIGHT_THRESHOLD) {
-       diff1 = resultsBuffer[1] - resultsBuffer[0];
+       diff1 = resultsBuffer[3] - resultsBuffer[2];
        /* See if there's an actual change in the value */
-       if (diff1 >= VALUE_CHANGE) {
+       if (abs(diff1) >= VALUE_CHANGE) {
            horizontalSteps = map(diff1, 0, 16383, 0, MAX_STEPS_X);
        }
-       diff2 = resultsBuffer[3] - resultsBuffer[2];
 
+       diff2 = resultsBuffer[0] - resultsBuffer[1];
        /* See if there's an actual change in the value */
-       if (diff2 >= VALUE_CHANGE) {
+       if (abs(diff2) >= VALUE_CHANGE) {
            verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
        }
+       //verticalSteps = 0; //REMEMBER TO CHANGE
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
@@ -179,8 +175,22 @@ void readAndMove() {
            moveTop(verticalSteps);
        }
 
+       int maxSteps = 0;
+       if(horizontalSteps > verticalSteps)
+           maxSteps = horizontalSteps;
+       else maxSteps = verticalSteps;
+       for (i = 0; i < maxSteps; i++) {
+           if(maxSteps - i < FINAL_STEPS) {
+               puts("SLOWER DELAY");
+               //__delay_cycles(SLOWER_DELAY);
+           }
+           else {
+               puts("FASTER DELAY");
+               //__delay_cycles(FASTER_DELAY);
+           }
+       }
    }
-
+   puts("-------------");
    __delay_cycles(100);
 }
 
@@ -192,26 +202,36 @@ void main(void)
 
     _hwInit();
 
+    //MOVEMENT THRESHSOLD CHECK
+    /*int counter = 0;
+    int i=0;
+
+   while(i < 2) {
+    if(counter + MOVIMENTO <= 5000) {
+        counter += MOVIMENTO;
+        moveTop(MOVIMENTO);
+    } else {
+        int diff = abs(counter - MAX_MOVIMENTO);
+        counter += diff;
+        moveTop(diff);
+    }
+    i++;
+    __delay_cycles(2000000);
+   }
+
+   moveTop(-counter);*/
+
     while(1){
 
         readAndMove();
-        moveTopForward(100);
-        moveBaseBackward(100);
-        __delay_cycles(2000000);
-        moveTopBackward(100);
-        moveBaseForward(100);
-        __delay_cycles(2000000);
+
+
+        //moveTop(3000);
+        //moveBase(30);
+        //__delay_cycles(2000000);
+        //moveTop(-3000);
+        //moveBase(-30);
+        //__delay_cycles(2000000);
 
    }
 }
-
-/*void ADC14_IRQHandler(void)
-{
-    uint64_t status;
-
-    status = ADC14_getEnabledInterruptStatus();
-
-
-
-    ADC14_clearInterruptFlag(status);
-}*/

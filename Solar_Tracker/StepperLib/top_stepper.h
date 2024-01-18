@@ -4,15 +4,11 @@
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include "msp.h"
 
-#define ENABLE_PIN GPIO_PIN5
-#define STEP_PIN GPIO_PIN6  // Specifica il pin per il segnale STEP
-#define DIR_PIN GPIO_PIN7   // Specifica il pin per il segnale DIR
+#define TOP_STEP_PIN GPIO_PIN6  // Specifica il pin per il segnale STEP
+#define TOP_DIR_PIN GPIO_PIN5   // Specifica il pin per il segnale DIR
 
 extern void init_topStepper();
 static void stepTopMotor();
-extern void moveTopForward(int steps);
-extern void moveTopBackward(int steps);
-extern void lock_topEnable();
-extern void unlock_topEnable();
+extern void moveTop(int steps);
 
 #endif
