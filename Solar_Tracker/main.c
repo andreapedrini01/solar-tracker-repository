@@ -164,7 +164,6 @@ void readAndMove() {
        if (abs(diff2) >= VALUE_CHANGE) {
            verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
        }
-       //verticalSteps = 0; //REMEMBER TO CHANGE
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
