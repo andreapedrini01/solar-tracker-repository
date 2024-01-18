@@ -23,7 +23,8 @@ int horizontalSteps = 0;
 int verticalSteps = 0;
 int diff1 = 0;
 int diff2 = 0;
-
+int base_position = 0;
+int top_position = 0;
 
 /* Graphic library context */
 //Graphics_Context g_sContext;
@@ -126,6 +127,19 @@ int map(int x, int in_min, int in_max, int out_min, int out_max)    //function u
   return ( (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min) * 100;
 }
 
+int limitSteps(int counter, int movement) {
+    int steps = movement;
+    // Upper limit check
+    if (counter+movement > MAX_MOVIMENTO) {
+        steps = movement - MAX_MOVIMENTO - MAX_MOVIMENTO;
+    }
+    // Lower limit check
+    if (counter+movement < 0-MAX_MOVIMENTO) {
+        steps = movement + MAX_MOVIMENTO + MAX_MOVIMENTO;
+    }
+    return steps;
+}
+
 void readAndMove() {
 
    int i=0;
@@ -168,10 +182,14 @@ void readAndMove() {
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
+           horizontalSteps = limitSteps(base_position,horizontalSteps);
+           base_position += horizontalSteps;
            moveBase(horizontalSteps);
        }
 
        if (verticalSteps != 0) {
+           verticalSteps = limitSteps(top_position, verticalSteps);
+           top_position += verticalSteps;
            moveTop(verticalSteps);
        }
 
@@ -212,7 +230,7 @@ void main(void)
         moveTop(MOVIMENTO);
     } else {
         int diff = abs(counter - MAX_MOVIMENTO);
-        counter += diff;
+        counter -= diff;
         moveTop(diff);
     }
     i++;
@@ -220,7 +238,6 @@ void main(void)
    }
 
    moveTop(-counter);*/
-
     while(1){
 
         readAndMove();
