@@ -2,3 +2,4 @@
 **.cproject
 **.project
 /Solar_Tracker/.cproject
+/Solar_Tracker/targetConfigs/MSP432P401R.ccxml
