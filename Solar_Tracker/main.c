@@ -12,8 +12,6 @@
 #define NUM_SENSORS 4
 #define VALUE_CHANGE 70
 #define LIGHT_THRESHOLD 300 // Adjust this threshold as needed
-#define MAX_STEPS_X 100
-#define MAX_STEPS_Y 100
 
 #define MOVIMENTO 3000
 #define MAX_MOVIMENTO 5000
@@ -124,7 +122,9 @@ void _hwInit()
 
 int map(int x, int in_min, int in_max, int out_min, int out_max)    //function useful in photoresistor algorithm
 {
-  return ( (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min) * 100;
+    int top_part = (x - in_min) * (out_max - out_min);
+    int bottom_part = in_max - in_min + out_min;
+    return  top_part * 100 / bottom_part;
 }
 
 int limitSteps(int counter, int movement) {
@@ -170,13 +170,14 @@ void readAndMove() {
        diff1 = resultsBuffer[3] - resultsBuffer[2];
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
-           horizontalSteps = map(diff1, 0, 16383, 0, MAX_STEPS_X);
+           horizontalSteps = map(diff1, -16383, 16383, -MAX_MOVIMENTO, MAX_MOVIMENTO);
        }
+       printf("diff1 = %d\n", diff1);
 
        diff2 = resultsBuffer[0] - resultsBuffer[1];
        /* See if there's an actual change in the value */
        if (abs(diff2) >= VALUE_CHANGE) {
-           verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
+           verticalSteps = map(diff2, -16383, 16383, -MAX_MOVIMENTO, MAX_MOVIMENTO);
        }
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
@@ -185,29 +186,14 @@ void readAndMove() {
            base_position += horizontalSteps;
            moveBase(horizontalSteps);
        }
+       printf("HorizontalSteps = %d\n", horizontalSteps);
 
-       if (verticalSteps != 0) {
+       /*if (verticalSteps != 0) {
            verticalSteps = limitSteps(top_position, verticalSteps);
            top_position += verticalSteps;
            moveTop(verticalSteps);
-       }
-
-       int maxSteps = 0;
-       if(horizontalSteps > verticalSteps)
-           maxSteps = horizontalSteps;
-       else maxSteps = verticalSteps;
-       for (i = 0; i < maxSteps; i++) {
-           if(maxSteps - i < FINAL_STEPS) {
-               puts("SLOWER DELAY");
-               //__delay_cycles(SLOWER_DELAY);
-           }
-           else {
-               puts("FASTER DELAY");
-               //__delay_cycles(FASTER_DELAY);
-           }
-       }
+       }*/
    }
-   puts("-------------");
    __delay_cycles(100);
 }
 
@@ -237,6 +223,7 @@ void main(void)
    }
 
    moveTop(-counter);*/
+
     while(1){
 
         readAndMove();
