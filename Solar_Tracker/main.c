@@ -124,7 +124,9 @@ void _hwInit()
 
 int map(int x, int in_min, int in_max, int out_min, int out_max)    //function useful in photoresistor algorithm
 {
-  return ( (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min) * 100;
+    int top_part = (x - in_min) * (out_max - out_min);
+    int bottom_part = in_max - in_min + out_min;
+    return  (top_part / bottom_part) * 100 + (top_part % bottom_part);
 }
 
 int limitSteps(int counter, int movement) {
