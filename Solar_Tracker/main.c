@@ -10,9 +10,8 @@
 #include <stepperLib/top_stepper.h>
 
 #define NUM_SENSORS 4
-#define VALUE_CHANGE 70
-#define LIGHT_THRESHOLD 300 // Adjust this threshold as needed
-
+#define VALUE_CHANGE 30
+#define LIGHT_THRESHOLD 0 // Adjust this threshold as needed
 #define MOVIMENTO 3000
 #define MAX_MOVIMENTO 5000
 
@@ -121,7 +120,7 @@ void _hwInit()
 
 int map(int x, int in_min, int in_max, int out_min, int out_max, int precision)    //function useful in photoresistor algorithm
 {
-    int top_part = (x - in_min) * (out_max - out_min) * precision;
+    int top_part = (x - in_min) * (out_max - out_min);
     printf("top_part = %d\n", top_part);
     int bottom_part = in_max - in_min;
     return  (top_part / bottom_part) + out_min;
@@ -166,10 +165,10 @@ void readAndMove() {
    for (i = 0; i < NUM_SENSORS; i++) {
        avgIntensity += resultsBuffer[i];
    }
-   avgIntensity /= NUM_SENSORS;
+   avgIntensity /= 3; //REMMEBER TO CHANGE
 
    if (avgIntensity > LIGHT_THRESHOLD) {
-       diff1 = resultsBuffer[1] - resultsBuffer[0];
+       diff1 = resultsBuffer[0] - resultsBuffer[1]; //REMEMBER TO CHANGE
        printf("diff1 = %d\n", diff1);
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
