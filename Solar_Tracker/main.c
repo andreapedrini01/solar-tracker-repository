@@ -196,18 +196,7 @@ void readAndMove() {
        if(horizontalSteps > verticalSteps)
            maxSteps = horizontalSteps;
        else maxSteps = verticalSteps;
-       for (i = 0; i < maxSteps; i++) {
-           if(maxSteps - i < FINAL_STEPS) {
-               puts("SLOWER DELAY");
-               //__delay_cycles(SLOWER_DELAY);
-           }
-           else {
-               puts("FASTER DELAY");
-               //__delay_cycles(FASTER_DELAY);
-           }
-       }
    }
-   puts("-------------");
    __delay_cycles(100);
 }
 
