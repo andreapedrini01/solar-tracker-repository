@@ -12,8 +12,6 @@
 #define NUM_SENSORS 4
 #define VALUE_CHANGE 70
 #define LIGHT_THRESHOLD 300 // Adjust this threshold as needed
-#define MAX_STEPS_X 100
-#define MAX_STEPS_Y 100
 
 #define MOVIMENTO 3000
 #define MAX_MOVIMENTO 5000
@@ -172,13 +170,13 @@ void readAndMove() {
        diff1 = resultsBuffer[3] - resultsBuffer[2];
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
-           horizontalSteps = map(diff1, 0, 16383, 0, MAX_STEPS_X);
+           horizontalSteps = map(diff1, -16383, 16383, -MAX_MOVIMENTO, MAX_MOVIMENTO);
        }
 
        diff2 = resultsBuffer[0] - resultsBuffer[1];
        /* See if there's an actual change in the value */
        if (abs(diff2) >= VALUE_CHANGE) {
-           verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
+           verticalSteps = map(diff2, -16383, 16383, -MAX_MOVIMENTO, MAX_MOVIMENTO);
        }
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
