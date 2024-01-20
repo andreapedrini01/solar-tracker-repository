@@ -17,8 +17,7 @@
 #define MAX_MOVIMENTO 5000
 
 static uint16_t resultsBuffer[NUM_SENSORS];
-int horizontalSteps = 0;
-int verticalSteps = 0;
+
 int diff1 = 0;
 int diff2 = 0;
 int base_position = 0;
@@ -122,13 +121,16 @@ void _hwInit()
 
 int map(int x, int in_min, int in_max, int out_min, int out_max)    //function useful in photoresistor algorithm
 {
-    int top_part = (x - in_min) * (out_max - out_min);
+    int top_part = (x - in_min) * (out_max - out_min) * 100;
+    printf("top_part = %d\n", top_part);
     int bottom_part = in_max - in_min + out_min;
-    return  top_part * 100 / bottom_part;
+    printf("bottom_part = %d\n", bottom_part);
+    return  top_part / bottom_part;
 }
 
 int limitSteps(int counter, int movement) {
     int steps = movement;
+    printf("Steps = %d\n", steps);
     // Upper limit check
     if (counter+movement > MAX_MOVIMENTO) {
         steps = movement - MAX_MOVIMENTO - MAX_MOVIMENTO;
@@ -142,6 +144,8 @@ int limitSteps(int counter, int movement) {
 
 void readAndMove() {
 
+   int horizontalSteps = 0;
+   int verticalSteps = 0;
    int i=0;
 
    /* ADC_MEM1 conversion completed */
@@ -170,23 +174,29 @@ void readAndMove() {
        diff1 = resultsBuffer[3] - resultsBuffer[2];
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
+           printf("Before horizontalSteps = %d\n", horizontalSteps);
            horizontalSteps = map(diff1, -16383, 16383, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           printf("After horizontalSteps = %d\n", horizontalSteps);
        }
        printf("diff1 = %d\n", diff1);
 
        diff2 = resultsBuffer[0] - resultsBuffer[1];
        /* See if there's an actual change in the value */
        if (abs(diff2) >= VALUE_CHANGE) {
-           verticalSteps = map(diff2, -16383, 16383, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           //verticalSteps = map(diff2, -16383, 16383, -MAX_MOVIMENTO, MAX_MOVIMENTO);  REMEMBER TO CHANGE
        }
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
            horizontalSteps = limitSteps(base_position,horizontalSteps);
+           printf("Before base_position = %d\n", base_position);
            base_position += horizontalSteps;
+           printf("After base_position = %d\n", base_position);
+           printf("HorizontalSteps = %d\n\n", horizontalSteps);
            moveBase(horizontalSteps);
        }
-       printf("HorizontalSteps = %d\n", horizontalSteps);
+
+
 
        /*if (verticalSteps != 0) {
            verticalSteps = limitSteps(top_position, verticalSteps);
