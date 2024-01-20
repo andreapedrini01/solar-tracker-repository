@@ -172,6 +172,7 @@ void readAndMove() {
        if (abs(diff1) >= VALUE_CHANGE) {
            horizontalSteps = map(diff1, 0, 16383, 0, MAX_STEPS_X);
        }
+       printf("diff1 = %d\n", diff1);
 
        diff2 = resultsBuffer[0] - resultsBuffer[1];
        /* See if there's an actual change in the value */
@@ -185,12 +186,13 @@ void readAndMove() {
            base_position += horizontalSteps;
            moveBase(horizontalSteps);
        }
+       printf("HorizontalSteps = %d\n", horizontalSteps);
 
-       if (verticalSteps != 0) {
+       /*if (verticalSteps != 0) {
            verticalSteps = limitSteps(top_position, verticalSteps);
            top_position += verticalSteps;
            moveTop(verticalSteps);
-       }
+       }*/
    }
    __delay_cycles(100);
 }
@@ -221,6 +223,7 @@ void main(void)
    }
 
    moveTop(-counter);*/
+
     while(1){
 
         readAndMove();
