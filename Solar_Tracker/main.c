@@ -152,10 +152,10 @@ void readAndMove() {
   if(ADC_INT1)
        {
        /* Store ADC14 conversion results */
-       resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
-       resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
-       resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
-       resultsBuffer[3] = ADC14_getResult(ADC_MEM3);
+       resultsBuffer[0] = map(ADC14_getResult(ADC_MEM0), 0, 16383, 0, 1023);
+       resultsBuffer[1] = map(ADC14_getResult(ADC_MEM1), 0, 16383, 0, 1023);
+       resultsBuffer[2] = map(ADC14_getResult(ADC_MEM2), 0, 16383, 0, 1023);
+       resultsBuffer[3] = map(ADC14_getResult(ADC_MEM3), 0, 16383, 0, 1023);
 
        /*printf("PR1: %5d\n", resultsBuffer[0]);
        printf("PR2: %5d\n", resultsBuffer[1]);
@@ -175,7 +175,7 @@ void readAndMove() {
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
            printf("Before horizontalSteps = %d\n", horizontalSteps);
-           horizontalSteps = map(diff1, -16383, 16383, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           horizontalSteps = map(diff1, -1023, 1023, -MAX_MOVIMENTO, MAX_MOVIMENTO);
            printf("After horizontalSteps = %d\n", horizontalSteps);
        }
        printf("diff1 = %d\n", diff1);
@@ -183,7 +183,7 @@ void readAndMove() {
        diff2 = resultsBuffer[0] - resultsBuffer[1];
        /* See if there's an actual change in the value */
        if (abs(diff2) >= VALUE_CHANGE) {
-           //verticalSteps = map(diff2, -16383, 16383, -MAX_MOVIMENTO, MAX_MOVIMENTO);  REMEMBER TO CHANGE
+           verticalSteps = map(diff2, -1023, 1023, -MAX_MOVIMENTO, MAX_MOVIMENTO);
        }
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
