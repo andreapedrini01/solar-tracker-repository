@@ -191,11 +191,6 @@ void readAndMove() {
            top_position += verticalSteps;
            moveTop(verticalSteps);
        }
-
-       int maxSteps = 0;
-       if(horizontalSteps > verticalSteps)
-           maxSteps = horizontalSteps;
-       else maxSteps = verticalSteps;
    }
    __delay_cycles(100);
 }
