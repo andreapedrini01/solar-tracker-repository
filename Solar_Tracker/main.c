@@ -178,7 +178,6 @@ void readAndMove() {
        if (abs(diff2) >= VALUE_CHANGE) {
            verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
        }
-       //verticalSteps = 0; //REMEMBER TO CHANGE
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
@@ -197,18 +196,7 @@ void readAndMove() {
        if(horizontalSteps > verticalSteps)
            maxSteps = horizontalSteps;
        else maxSteps = verticalSteps;
-       for (i = 0; i < maxSteps; i++) {
-           if(maxSteps - i < FINAL_STEPS) {
-               puts("SLOWER DELAY");
-               //__delay_cycles(SLOWER_DELAY);
-           }
-           else {
-               puts("FASTER DELAY");
-               //__delay_cycles(FASTER_DELAY);
-           }
-       }
    }
-   puts("-------------");
    __delay_cycles(100);
 }
 
