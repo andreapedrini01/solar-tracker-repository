@@ -165,7 +165,7 @@ void readAndMove() {
    for (i = 0; i < NUM_SENSORS; i++) {
        avgIntensity += resultsBuffer[i];
    }
-   avgIntensity /= 3; //REMMEBER TO CHANGE
+   avgIntensity /= NUM_SENSORS;
 
    if (avgIntensity > LIGHT_THRESHOLD) {
        diff1 = resultsBuffer[0] - resultsBuffer[1]; //REMEMBER TO CHANGE
