@@ -11,10 +11,9 @@
 
 #define NUM_SENSORS 4
 #define VALUE_CHANGE 30
-#define LIGHT_THRESHOLD 100 // Adjust this threshold as needed
+#define LIGHT_THRESHOLD 0 // Adjust this threshold as needed
 #define PHOTO_INITIAL 16383
 #define MAX_PHOTO_SCALED 1023
-
 #define MOVIMENTO 3000
 #define MAX_MOVIMENTO 5000
 
@@ -153,25 +152,25 @@ void readAndMove() {
    int i=0;
 
   /* Store ADC14 conversion results */
-   resultsBuffer[0] = scaleReading(ADC14_getResult(ADC_MEM0));
-   resultsBuffer[1] = scaleReading(ADC14_getResult(ADC_MEM1));
-   resultsBuffer[2] = scaleReading(ADC14_getResult(ADC_MEM2));
-   resultsBuffer[3] = scaleReading(ADC14_getResult(ADC_MEM3));
+       resultsBuffer[0] = scaleReading(ADC14_getResult(ADC_MEM0));
+       resultsBuffer[1] = scaleReading(ADC14_getResult(ADC_MEM1));
+       resultsBuffer[2] = scaleReading(ADC14_getResult(ADC_MEM2));
+       resultsBuffer[3] = scaleReading(ADC14_getResult(ADC_MEM3));
 
-     printf("PR0: %5d\n", resultsBuffer[0]);
-     printf("PR1: %5d\n", resultsBuffer[1]);
-     printf("PR2: %5d\n", resultsBuffer[2]);
-     printf("PR3: %5d\n\n", resultsBuffer[3]);
+         printf("PR0: %5d\n", resultsBuffer[0]);
+         printf("PR1: %5d\n", resultsBuffer[1]);
+         printf("PR2: %5d\n", resultsBuffer[2]);
+         printf("PR3: %5d\n\n", resultsBuffer[3]);
 
    int avgIntensity = 0;
 
    for (i = 0; i < NUM_SENSORS; i++) {
        avgIntensity += resultsBuffer[i];
    }
-   avgIntensity /= NUM_SENSORS;
+   avgIntensity /= 3; //REMMEBER TO CHANGE
 
    if (avgIntensity > LIGHT_THRESHOLD) {
-       diff1 = scaleReading(resultsBuffer[0] - resultsBuffer[1]);
+       diff1 = resultsBuffer[0] - resultsBuffer[1]; //REMEMBER TO CHANGE
        printf("diff1 = %d\n", diff1);
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
