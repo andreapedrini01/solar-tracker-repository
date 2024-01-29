@@ -10,20 +10,17 @@
 #include <stepperLib/top_stepper.h>
 
 #define NUM_SENSORS 4
-#define VALUE_CHANGE 70
-#define LIGHT_THRESHOLD 300 // Adjust this threshold as needed
-#define MAX_STEPS_X 100
-#define MAX_STEPS_Y 100
-
+#define VALUE_CHANGE 30
+#define LIGHT_THRESHOLD 0 // Adjust this threshold as needed
 #define MOVIMENTO 3000
 #define MAX_MOVIMENTO 5000
 
 static uint16_t resultsBuffer[NUM_SENSORS];
-int horizontalSteps = 0;
-int verticalSteps = 0;
+
 int diff1 = 0;
 int diff2 = 0;
-
+int base_position = 0;
+int top_position = 0;
 
 /* Graphic library context */
 //Graphics_Context g_sContext;
@@ -121,76 +118,86 @@ void _hwInit()
     _adcInit();
 }
 
-int map(int x, int in_min, int in_max, int out_min, int out_max)    //function useful in photoresistor algorithm
+int map(int x, int in_min, int in_max, int out_min, int out_max, int precision)    //function useful in photoresistor algorithm
 {
-  return ( (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min) * 100;
+    int top_part = (x - in_min) * (out_max - out_min);
+    printf("top_part = %d\n", top_part);
+    int bottom_part = in_max - in_min;
+    return  (top_part / bottom_part) + out_min;
+}
+
+int limitSteps(int counter, int movement) {
+    int steps = movement;
+    // Upper limit check
+    if (counter+movement > MAX_MOVIMENTO) {
+        steps = movement - MAX_MOVIMENTO - MAX_MOVIMENTO;
+    }
+    // Lower limit check
+    if (counter+movement < 0-MAX_MOVIMENTO) {
+        steps = movement + MAX_MOVIMENTO + MAX_MOVIMENTO;
+    }
+    return steps;
+}
+
+int scaleReading(reading) {
+    return map(reading, 0, 16383, 0, 1023, 1);
 }
 
 void readAndMove() {
 
+   int horizontalSteps = 0;
+   int verticalSteps = 0;
    int i=0;
 
-   /* ADC_MEM1 conversion completed */
-  if(ADC_INT1)
-       {
-       /* Store ADC14 conversion results */
-       resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
-       resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
-       resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
-       resultsBuffer[3] = ADC14_getResult(ADC_MEM3);
+  /* Store ADC14 conversion results */
+       resultsBuffer[0] = scaleReading(ADC14_getResult(ADC_MEM0));
+       resultsBuffer[1] = scaleReading(ADC14_getResult(ADC_MEM1));
+       resultsBuffer[2] = scaleReading(ADC14_getResult(ADC_MEM2));
+       resultsBuffer[3] = scaleReading(ADC14_getResult(ADC_MEM3));
 
-       /*printf("PR1: %5d\n", resultsBuffer[0]);
-       printf("PR2: %5d\n", resultsBuffer[1]);
-       printf("PR3: %5d\n", resultsBuffer[2]);
-       printf("PR4: %5d\n\n", resultsBuffer[3]);*/
-   }
+         printf("PR0: %5d\n", resultsBuffer[0]);
+         printf("PR1: %5d\n", resultsBuffer[1]);
+         printf("PR2: %5d\n", resultsBuffer[2]);
+         printf("PR3: %5d\n\n", resultsBuffer[3]);
 
    int avgIntensity = 0;
 
    for (i = 0; i < NUM_SENSORS; i++) {
        avgIntensity += resultsBuffer[i];
    }
-   avgIntensity /= NUM_SENSORS;
+   avgIntensity /= 3; //REMMEBER TO CHANGE
 
    if (avgIntensity > LIGHT_THRESHOLD) {
-       diff1 = resultsBuffer[3] - resultsBuffer[2];
+       diff1 = resultsBuffer[0] - resultsBuffer[1]; //REMEMBER TO CHANGE
+       printf("diff1 = %d\n", diff1);
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
-           horizontalSteps = map(diff1, 0, 16383, 0, MAX_STEPS_X);
+           horizontalSteps = map(diff1, -1023, 1023, -MAX_MOVIMENTO, MAX_MOVIMENTO, 100);
        }
+       printf("horizontalSteps before limiting = %d\n", horizontalSteps);
 
        diff2 = resultsBuffer[0] - resultsBuffer[1];
        /* See if there's an actual change in the value */
        if (abs(diff2) >= VALUE_CHANGE) {
-           verticalSteps = map(diff2, 0, 16383, 0, MAX_STEPS_Y);
+           verticalSteps = map(diff2, -1023, 1023, -MAX_MOVIMENTO, MAX_MOVIMENTO, 100);
        }
-       //verticalSteps = 0; //REMEMBER TO CHANGE
 
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
+           horizontalSteps = limitSteps(base_position,horizontalSteps);
+           printf("horizontalSteps after limiting = %d\n", horizontalSteps);
+           base_position += horizontalSteps;
            moveBase(horizontalSteps);
        }
 
-       if (verticalSteps != 0) {
-           moveTop(verticalSteps);
-       }
+       printf("\n");
 
-       int maxSteps = 0;
-       if(horizontalSteps > verticalSteps)
-           maxSteps = horizontalSteps;
-       else maxSteps = verticalSteps;
-       for (i = 0; i < maxSteps; i++) {
-           if(maxSteps - i < FINAL_STEPS) {
-               puts("SLOWER DELAY");
-               //__delay_cycles(SLOWER_DELAY);
-           }
-           else {
-               puts("FASTER DELAY");
-               //__delay_cycles(FASTER_DELAY);
-           }
-       }
+       /*if (verticalSteps != 0) {
+           verticalSteps = limitSteps(top_position, verticalSteps);
+           top_position += verticalSteps;
+           moveTop(verticalSteps);
+       }*/
    }
-   puts("-------------");
    __delay_cycles(100);
 }
 
@@ -212,7 +219,7 @@ void main(void)
         moveTop(MOVIMENTO);
     } else {
         int diff = abs(counter - MAX_MOVIMENTO);
-        counter += diff;
+        counter -= diff;
         moveTop(diff);
     }
     i++;
@@ -222,6 +229,9 @@ void main(void)
    moveTop(-counter);*/
 
     while(1){
+        /* ADC_MEM1 conversion completed */
+        if(!ADC_INT1)
+           continue;
 
         readAndMove();
 
