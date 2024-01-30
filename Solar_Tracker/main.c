@@ -8,6 +8,9 @@
 #include <string.h>
 #include <StepperLib/base_stepper.h>
 #include <stepperLib/top_stepper.h>
+#include "FreeRTOS.h"
+#include "task.h"
+#include "uart.h"
 
 #define NUM_SENSORS 4
 #define VALUE_CHANGE 30
