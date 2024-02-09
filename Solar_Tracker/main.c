@@ -179,9 +179,9 @@ void readAndMove() {
        printf("diff1_1 = %d\n", diff1_1);
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
-           horizontalSteps = map(diff1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           horizontalSteps = map(diff1, -16383, 16383, -10000, 10000);
        } else if (abs(diff1_1) >= VALUE_CHANGE) {
-           horizontalSteps = map(diff1_1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           horizontalSteps = map(diff1_1, -16383, 16383, -10000, 10000);
        }
        printf("horizontalSteps before limiting = %d\n", horizontalSteps);
 
@@ -189,9 +189,9 @@ void readAndMove() {
        diff2_2 = resultsBuffer[1] - resultsBuffer[2];
        /* See if there's an actual change in the value */
        if (abs(diff2) >= VALUE_CHANGE)
-           verticalSteps = map(diff2, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           verticalSteps = map(diff2, -16383, 16383, -10000, 10000);
        else if (abs(diff2_2) >= VALUE_CHANGE)
-           verticalSteps = map(diff2_2, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           verticalSteps = map(diff2_2, -16383, 16383, -10000, 10000);
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
           horizontalSteps = limitSteps(base_position,horizontalSteps);
