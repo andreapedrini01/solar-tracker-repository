@@ -182,10 +182,10 @@ void readAndMove() {
        diff2 = resultsBuffer[0] - resultsBuffer[3];
        diff2_2 = resultsBuffer[1] - resultsBuffer[2];
        /* See if there's an actual change in the value */
-       if (abs(diff2) >= VALUE_CHANGE || abs(diff2_2) >= VALUE_CHANGE) {
+       if (abs(diff2) >= VALUE_CHANGE)
            verticalSteps = map(diff2, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
-       }
-
+       else if (abs(diff2_2) >= VALUE_CHANGE)
+           verticalSteps = map(diff2_2, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
            horizontalSteps = limitSteps(base_position,horizontalSteps);
