@@ -19,8 +19,7 @@
 
 static uint16_t resultsBuffer[NUM_SENSORS];
 
-int diff1 = 0;
-int diff2 = 0;
+
 int base_position = 0;
 int top_position = 0;
 
@@ -149,13 +148,17 @@ void readAndMove() {
 
    int horizontalSteps = 0;
    int verticalSteps = 0;
+   int diff1 = 0;
+   int diff1_1 = 0;
+   int diff2 = 0;
+   int diff2_2 = 0;
    int i=0;
 
   /* Store ADC14 conversion results */
-       resultsBuffer[0] = scaleReading(ADC14_getResult(ADC_MEM0));
-       resultsBuffer[1] = scaleReading(ADC14_getResult(ADC_MEM1));
-       resultsBuffer[2] = scaleReading(ADC14_getResult(ADC_MEM2));
-       resultsBuffer[3] = scaleReading(ADC14_getResult(ADC_MEM3));
+       resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
+       resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
+       resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
+       resultsBuffer[3] = ADC14_getResult(ADC_MEM3);
 
          printf("PR0: %5d\n", resultsBuffer[0]);
          printf("PR1: %5d\n", resultsBuffer[1]);
@@ -170,9 +173,10 @@ void readAndMove() {
    avgIntensity /= NUM_SENSORS;
 
    if (avgIntensity > LIGHT_THRESHOLD) {
-       diff1 = resultsBuffer[0] - resultsBuffer[1]; //REMEMBER TO CHANGE
+       diff1 = resultsBuffer[0] - resultsBuffer[1];
        diff1_1 = resultsBuffer[3] - resultsBuffer[2];
        printf("diff1 = %d\n", diff1);
+       printf("diff1_1 = %d\n", diff1_1);
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
            horizontalSteps = map(diff1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
@@ -190,11 +194,11 @@ void readAndMove() {
            verticalSteps = map(diff2_2, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
-           horizontalSteps = limitSteps(base_position,horizontalSteps);
-           printf("horizontalSteps after limiting = %d\n", horizontalSteps);
-           base_position += horizontalSteps;
-           moveBase(horizontalSteps);
-       }
+          horizontalSteps = limitSteps(base_position,horizontalSteps);
+          printf("horizontalSteps after limiting = %d\n", horizontalSteps);
+          base_position += horizontalSteps;
+          moveBase(horizontalSteps);
+      }
 
        printf("\n");
 
@@ -205,6 +209,10 @@ void readAndMove() {
        }*/
    }
    __delay_cycles(100);
+}
+
+void doubleRead() {
+
 }
 
 /*
