@@ -12,6 +12,8 @@
 #define NUM_SENSORS 4
 #define VALUE_CHANGE 30
 #define LIGHT_THRESHOLD 0 // Adjust this threshold as needed
+#define PHOTO_INITIAL 16383
+#define MAX_PHOTO_SCALED 1023
 #define MOVIMENTO 3000
 #define MAX_MOVIMENTO 5000
 
@@ -117,7 +119,7 @@ void _hwInit()
     _adcInit();
 }
 
-int map(int x, int in_min, int in_max, int out_min, int out_max, int precision)    //function useful in photoresistor algorithm
+int map(int x, int in_min, int in_max, int out_min, int out_max)    //function useful in photoresistor algorithm
 {
     int top_part = (x - in_min) * (out_max - out_min);
     printf("top_part = %d\n", top_part);
@@ -139,7 +141,7 @@ int limitSteps(int counter, int movement) {
 }
 
 int scaleReading(reading) {
-    return map(reading, 0, 16383, 0, 1023, 1);
+    return map(reading, 0, 16383, 0, 1023);
 }
 
 void readAndMove() {
@@ -176,11 +178,20 @@ void readAndMove() {
        printf("diff1 = %d\n", diff1);
        printf("diff1_1 = %d\n", diff1_1);
        /* See if there's an actual change in the value */
-       if (abs(diff1) >= VALUE_CHANGE || abs(diff1_1) >= VALUE_CHANGE) {
-           horizontalSteps = map(diff1_1, -16383, 16383, -10000, 10000, 100);
+       if (abs(diff1) >= VALUE_CHANGE) {
+           horizontalSteps = map(diff1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+       } else if (abs(diff1_1) >= VALUE_CHANGE) {
+           horizontalSteps = map(diff1_1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
        }
        printf("horizontalSteps before limiting = %d\n", horizontalSteps);
 
+       diff2 = resultsBuffer[0] - resultsBuffer[3];
+       diff2_2 = resultsBuffer[1] - resultsBuffer[2];
+       /* See if there's an actual change in the value */
+       if (abs(diff2) >= VALUE_CHANGE)
+           verticalSteps = map(diff2, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+       else if (abs(diff2_2) >= VALUE_CHANGE)
+           verticalSteps = map(diff2_2, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
           horizontalSteps = limitSteps(base_position,horizontalSteps);
@@ -188,14 +199,6 @@ void readAndMove() {
           base_position += horizontalSteps;
           moveBase(horizontalSteps);
       }
-
-       diff2 = resultsBuffer[0] - resultsBuffer[1];
-       /* See if there's an actual change in the value */
-       if (abs(diff2) >= VALUE_CHANGE) {
-           verticalSteps = map(diff2, -1023, 1023, -MAX_MOVIMENTO, MAX_MOVIMENTO, 100);
-       }
-
-
 
        printf("\n");
 
