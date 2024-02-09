@@ -174,8 +174,10 @@ void readAndMove() {
        diff1_1 = resultsBuffer[3] - resultsBuffer[2];
        printf("diff1 = %d\n", diff1);
        /* See if there's an actual change in the value */
-       if (abs(diff1) >= VALUE_CHANGE || abs(diff1_1) >= VALUE_CHANGE) {
+       if (abs(diff1) >= VALUE_CHANGE) {
            horizontalSteps = map(diff1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+       } else if (abs(diff1_1) >= VALUE_CHANGE) {
+           horizontalSteps = map(diff1_1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
        }
        printf("horizontalSteps before limiting = %d\n", horizontalSteps);
 
