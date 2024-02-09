@@ -12,14 +12,12 @@
 #define NUM_SENSORS 4
 #define VALUE_CHANGE 30
 #define LIGHT_THRESHOLD 0 // Adjust this threshold as needed
-#define PHOTO_INITIAL 16383
-#define MAX_PHOTO_SCALED 1023
 #define MOVIMENTO 3000
 #define MAX_MOVIMENTO 5000
 
 static uint16_t resultsBuffer[NUM_SENSORS];
 
-
+int readAndMove = 1;
 int base_position = 0;
 int top_position = 0;
 
@@ -179,9 +177,9 @@ void readAndMove() {
        printf("diff1_1 = %d\n", diff1_1);
        /* See if there's an actual change in the value */
        if (abs(diff1) >= VALUE_CHANGE) {
-           horizontalSteps = map(diff1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           horizontalSteps = map(diff1, -16383, 16383, -10000, 10000);
        } else if (abs(diff1_1) >= VALUE_CHANGE) {
-           horizontalSteps = map(diff1_1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           horizontalSteps = map(diff1_1, -16383, 16383, -10000, 10000);
        }
        printf("horizontalSteps before limiting = %d\n", horizontalSteps);
 
@@ -189,9 +187,9 @@ void readAndMove() {
        diff2_2 = resultsBuffer[1] - resultsBuffer[2];
        /* See if there's an actual change in the value */
        if (abs(diff2) >= VALUE_CHANGE)
-           verticalSteps = map(diff2, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           verticalSteps = map(diff2, -16383, 16383, -10000, 10000);
        else if (abs(diff2_2) >= VALUE_CHANGE)
-           verticalSteps = map(diff2_2, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           verticalSteps = map(diff2_2, -16383, 16383, -10000, 10000);
        // control if the motion has to be clockwise or anti-clockwise and send the impulses
        if (horizontalSteps != 0) {
           horizontalSteps = limitSteps(base_position,horizontalSteps);
@@ -282,21 +280,40 @@ void main(void)
    }
 
    moveTop(-counter);*/
+    if (readAndMove == 1) {
+        while(1){
+                /* ADC_MEM1 conversion completed */
+                if(!ADC_INT1)
+                   continue;
 
-    while(1){
-        /* ADC_MEM1 conversion completed */
-        if(!ADC_INT1)
-           continue;
+                readAndMove();
 
-        readAndMove();
+           }
+    } else {
+        int fullMovementCompleted = 0;
+        while(1){
+                /* ADC_MEM1 conversion completed */
+                if(!ADC_INT1)
+                   continue;
+
+                if (fullMovementCompleted == 1) {
+                    // move horizontal
+                    moveHorizontal();
+                    fullMovementCompleted = 0;
+                } else {
+                    moveVertical();
+                    fullMovementCompleted = 1;
+                }
+
+           }
+    }
 
 
-        //moveTop(3000);
-        //moveBase(30);
-        //__delay_cycles(2000000);
-        //moveTop(-3000);
-        //moveBase(-30);
-        //__delay_cycles(2000000);
 
-   }
+    //moveTop(3000);
+    //moveBase(30);
+    //__delay_cycles(2000000);
+    //moveTop(-3000);
+    //moveBase(-30);
+    //__delay_cycles(2000000);
 }
