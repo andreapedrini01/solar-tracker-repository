@@ -211,8 +211,49 @@ void readAndMove() {
    __delay_cycles(100);
 }
 
-void doubleRead() {
+void horMov() {
+    int horizontalSteps = 0;
+       int diff1 = 0;
+       int i=0;
 
+      /* Store ADC14 conversion results */
+           resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
+           resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
+           resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
+           resultsBuffer[3] = ADC14_getResult(ADC_MEM3);
+
+             printf("PR0: %5d\n", resultsBuffer[0]);
+             printf("PR1: %5d\n", resultsBuffer[1]);
+             printf("PR2: %5d\n", resultsBuffer[2]);
+             printf("PR3: %5d\n\n", resultsBuffer[3]);
+
+       int avgIntensity = 0;
+
+       for (i = 0; i < NUM_SENSORS; i++) {
+           avgIntensity += resultsBuffer[i];
+       }
+       avgIntensity /= NUM_SENSORS;
+
+       if (avgIntensity > LIGHT_THRESHOLD) {
+           diff1 = resultsBuffer[0] - resultsBuffer[1];
+           diff1_1 = resultsBuffer[3] - resultsBuffer[2];
+           printf("diff1 = %d\n", diff1);
+           printf("diff1_1 = %d\n", diff1_1);
+           /* See if there's an actual change in the value */
+           if (abs(diff1) >= VALUE_CHANGE) {
+               horizontalSteps = map(diff1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           } else if (abs(diff1_1) >= VALUE_CHANGE) {
+               horizontalSteps = map(diff1_1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
+           }
+           printf("horizontalSteps before limiting = %d\n", horizontalSteps);
+
+           // control if the motion has to be clockwise or anti-clockwise and send the impulses
+           if (horizontalSteps != 0) {
+              horizontalSteps = limitSteps(base_position,horizontalSteps);
+              printf("horizontalSteps after limiting = %d\n", horizontalSteps);
+              base_position += horizontalSteps;
+              moveBase(horizontalSteps);
+          }
 }
 
 /*
