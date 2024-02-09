@@ -12,8 +12,6 @@
 #define NUM_SENSORS 4
 #define VALUE_CHANGE 30
 #define LIGHT_THRESHOLD 0 // Adjust this threshold as needed
-#define PHOTO_INITIAL 16383
-#define MAX_PHOTO_SCALED 1023
 #define MOVIMENTO 3000
 #define MAX_MOVIMENTO 5000
 
