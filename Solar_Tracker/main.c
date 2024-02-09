@@ -19,7 +19,7 @@
 
 static uint16_t resultsBuffer[NUM_SENSORS];
 
-
+int readAndMove = 1;
 int base_position = 0;
 int top_position = 0;
 
@@ -241,21 +241,40 @@ void main(void)
    }
 
    moveTop(-counter);*/
+    if (readAndMove == 1) {
+        while(1){
+                /* ADC_MEM1 conversion completed */
+                if(!ADC_INT1)
+                   continue;
 
-    while(1){
-        /* ADC_MEM1 conversion completed */
-        if(!ADC_INT1)
-           continue;
+                readAndMove();
 
-        readAndMove();
+           }
+    } else {
+        int fullMovementCompleted = 0;
+        while(1){
+                /* ADC_MEM1 conversion completed */
+                if(!ADC_INT1)
+                   continue;
+
+                if (fullMovementCompleted == 1) {
+                    // move horizontal
+                    moveHorizontal();
+                    fullMovementCompleted = 0;
+                } else {
+                    moveVertical();
+                    fullMovementCompleted = 1;
+                }
+
+           }
+    }
 
 
-        //moveTop(3000);
-        //moveBase(30);
-        //__delay_cycles(2000000);
-        //moveTop(-3000);
-        //moveBase(-30);
-        //__delay_cycles(2000000);
 
-   }
+    //moveTop(3000);
+    //moveBase(30);
+    //__delay_cycles(2000000);
+    //moveTop(-3000);
+    //moveBase(-30);
+    //__delay_cycles(2000000);
 }
