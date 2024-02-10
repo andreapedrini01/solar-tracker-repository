@@ -17,7 +17,7 @@
 
 static uint16_t resultsBuffer[NUM_SENSORS];
 
-int readAndMove = 1;
+int boolFunction = 1;
 int base_position = 0;
 int top_position = 0;
 
@@ -119,7 +119,7 @@ void _hwInit()
 
 int map(int x, int in_min, int in_max, int out_min, int out_max)    //function useful in photoresistor algorithm
 {
-    int top_part = (x - in_min) * (out_max - out_min);
+    long int top_part = (x - in_min) * (out_max - out_min);
     printf("top_part = %d\n", top_part);
     int bottom_part = in_max - in_min;
     return  (top_part / bottom_part) + out_min;
@@ -200,11 +200,11 @@ void readAndMove() {
 
        printf("\n");
 
-       /*if (verticalSteps != 0) {
+       if (verticalSteps != 0) {
            verticalSteps = limitSteps(top_position, verticalSteps);
            top_position += verticalSteps;
            moveTop(verticalSteps);
-       }*/
+       }
    }
    __delay_cycles(100);
 }
@@ -212,7 +212,7 @@ void readAndMove() {
 void horMov() {
     int horizontalSteps = 0;
        int diff1 = 0;
-       int i=0;
+       int diff1_1 = 0;
 
       /* Store ADC14 conversion results */
            resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
@@ -226,7 +226,7 @@ void horMov() {
              printf("PR3: %5d\n\n", resultsBuffer[3]);
 
        int avgIntensity = 0;
-
+       int i=0;
        for (i = 0; i < NUM_SENSORS; i++) {
            avgIntensity += resultsBuffer[i];
        }
@@ -239,11 +239,9 @@ void horMov() {
            printf("diff1_1 = %d\n", diff1_1);
            /* See if there's an actual change in the value */
            if (abs(diff1) >= VALUE_CHANGE) {
-               horizontalSteps = map(diff1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
-           } else if (abs(diff1_1) >= VALUE_CHANGE) {
-               horizontalSteps = map(diff1_1, -MAX_PHOTO_SCALED, MAX_PHOTO_SCALED, -MAX_MOVIMENTO, MAX_MOVIMENTO);
-           }
-           printf("horizontalSteps before limiting = %d\n", horizontalSteps);
+                      horizontalSteps = map(diff1, -16383, 16383, -10000, 10000);
+           } else if (abs(diff1_1) >= VALUE_CHANGE)
+                      horizontalSteps = map(diff1_1, -16383, 16383, -10000, 10000);
 
            // control if the motion has to be clockwise or anti-clockwise and send the impulses
            if (horizontalSteps != 0) {
@@ -252,37 +250,61 @@ void horMov() {
               base_position += horizontalSteps;
               moveBase(horizontalSteps);
           }
+       }
+}
+
+void verMov() {
+   int verticalSteps = 0;
+   int diff2 = 0;
+   int diff2_2 = 0;
+
+      /* Store ADC14 conversion results */
+           resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
+           resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
+           resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
+           resultsBuffer[3] = ADC14_getResult(ADC_MEM3);
+
+           printf("PR0: %5d\n", resultsBuffer[0]);
+           printf("PR1: %5d\n", resultsBuffer[1]);
+           printf("PR2: %5d\n", resultsBuffer[2]);
+           printf("PR3: %5d\n\n", resultsBuffer[3]);
+
+       int avgIntensity = 0;
+       int i=0;
+       for (i = 0; i < NUM_SENSORS; i++) {
+           avgIntensity += resultsBuffer[i];
+       }
+       avgIntensity /= NUM_SENSORS;
+
+       diff2 = resultsBuffer[0] - resultsBuffer[3];
+       diff2_2 = resultsBuffer[1] - resultsBuffer[2];
+       /* See if there's an actual change in the value */
+       if (abs(diff2) >= VALUE_CHANGE)
+                  verticalSteps = map(diff2, -16383, 16383, -10000, 10000);
+              else if (abs(diff2_2) >= VALUE_CHANGE)
+                  verticalSteps = map(diff2_2, -16383, 16383, -10000, 10000);
+
+       if (verticalSteps != 0) {
+          verticalSteps = limitSteps(top_position, verticalSteps);
+          top_position += verticalSteps;
+          moveTop(verticalSteps);
+       }
 }
 
 /*
  * Main function
  */
-void main(void)
-{
+void main(void) {
 
     _hwInit();
 
-    //MOVEMENT THRESHSOLD CHECK
-    /*int counter = 0;
-    int i=0;
+    /*while(1) {
+            moveTop(1);
+        }*/
 
-   while(i < 2) {
-    if(counter + MOVIMENTO <= 5000) {
-        counter += MOVIMENTO;
-        moveTop(MOVIMENTO);
-    } else {
-        int diff = abs(counter - MAX_MOVIMENTO);
-        counter -= diff;
-        moveTop(diff);
-    }
-    i++;
-    __delay_cycles(2000000);
-   }
-
-   moveTop(-counter);*/
-    if (readAndMove == 1) {
+    if (boolFunction == 1) {
         while(1){
-                /* ADC_MEM1 conversion completed */
+                // ADC_MEM1 conversion completed
                 if(!ADC_INT1)
                    continue;
 
@@ -292,28 +314,20 @@ void main(void)
     } else {
         int fullMovementCompleted = 0;
         while(1){
-                /* ADC_MEM1 conversion completed */
+                // ADC_MEM1 conversion completed
                 if(!ADC_INT1)
                    continue;
 
                 if (fullMovementCompleted == 1) {
                     // move horizontal
-                    moveHorizontal();
+                    horMov();
                     fullMovementCompleted = 0;
                 } else {
-                    moveVertical();
+                    //move vertical
+                    verMov();
                     fullMovementCompleted = 1;
                 }
 
            }
     }
-
-
-
-    //moveTop(3000);
-    //moveBase(30);
-    //__delay_cycles(2000000);
-    //moveTop(-3000);
-    //moveBase(-30);
-    //__delay_cycles(2000000);
 }
