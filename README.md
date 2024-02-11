@@ -10,7 +10,6 @@
 - [Getting started](#getting-started)
 - [Functionalities explanation](#functionalities-explanation)
 - [Team](#team)
- 
 
 ## About the project
 The idea of this project not only arises from the challenge of how to take advantage of the benefits and features of a microcontroller like the MSP432P401R, but also from how to provide a solution to a real-world problem.
@@ -22,8 +21,7 @@ Our goal for this solar tracker project is to implement it in the simplest way p
 
 ## Requirements
 #### Hardware
-For this project we use:
-
+The hardware required for this project is listed as follows:
 - Texas Instruments MSP432P401R microcontroller
 - 2 Gearboxes
 - 2 Stepper motors
@@ -34,7 +32,8 @@ For this project we use:
 - Base and columns to assemble everything as a whole
   
 #### Software
-- Code Composer Studio
+For this project, the following software is needed:
+- Code Composer Studio as and IDE
 - Solidworks (For the design of the containing structure)
   
 ### Installation
