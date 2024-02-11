@@ -1,12 +1,5 @@
 # Solar tracker
 
-| Members        | Mail |
-|--|--|
-| Andrea Pedrini | andrea.pedrini@studenti.unitn.it |
-| Irina Voloshina | irina.voloshina@studenti.unitn.it |
-| Riccardo Stiz | riccardo.stiz@studenti.unitn.it |
-| Francheska Paz Contreras Delgado | fp.contrerasdelgado@studenti.unitn.it |
-
 ## Table of contents
 - [About the project](#about-the-project)
 - [Requirements](#requirements)
@@ -15,6 +8,7 @@
 - [Folder structure](#folder-structure)
 - [Functionalities explanation](#functionalities-explanation)
 - [Getting started](#getting-started)
+- [Team](#team)
  
 
 ## About the project
@@ -63,6 +57,14 @@ Once the horizontal movement of the arm is completed, we proceed with the vertic
 1. Open the project in Code Composer Studio.
 2. On the Arm Compiler options add the source directory:
    > *simplelink_msp432_sdk_3_40_01_02/*
-4. On the Arm Linker options, add the following path:
+3. On the Arm Linker options, add the following path:
    > *[...]/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/ccs/msp432p4xx_driverlib.lib*
-6. Build and run the project. In the Code Composer Studio console, the values detected by the photoresistors should be visible.
+4. Build and run the project. In the Code Composer Studio console, the values detected by the photoresistors should be visible.
+
+## Team
+| Members        | Mail |
+|--|--|
+| Andrea Pedrini | andrea.pedrini@studenti.unitn.it |
+| Irina Voloshina | irina.voloshina@studenti.unitn.it |
+| Riccardo Stiz | riccardo.stiz@studenti.unitn.it |
+| Francheska Paz Contreras Delgado | fp.contrerasdelgado@studenti.unitn.it |
