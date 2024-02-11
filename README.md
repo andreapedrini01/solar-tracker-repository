@@ -5,9 +5,10 @@
 - [Requirements](#requirements)
   - [Hardware](#hardware)
   - [Software](#software)
+- [Installation](#installation)
 - [Folder structure](#folder-structure)
-- [Functionalities explanation](#functionalities-explanation)
 - [Getting started](#getting-started)
+- [Functionalities explanation](#functionalities-explanation)
 - [Team](#team)
  
 
@@ -35,11 +36,52 @@ For this project we use:
 #### Software
 - Code Composer Studio
 - Solidworks (For the design of the containing structure)
+  
+### Installation
+Clone the repository
+```
+git clone git@github.com:AirinLavis/iot-proj-es
+```
 
 ## Folder structure
-.
-.
-.
+```
+├── README.md
+├── SOLIDWORKS
+│   ├── 17HE15-1504S IMAGE.png
+│   ├── 17HE15-1504S.STEP
+│   ├── ARM IMAGE.png
+│   ├── ARM.SLDPRT
+│   ├── BRACKET IMAGE.png
+│   ├── BRACKET.SLDPRT
+│   ├── GEARBOX IMAGE.png
+│   ├── GEARBOX MG17-G100.STEP
+│   ├── LINK IMAGE.png
+│   └── LINK.SLDPRT
+└── Solar_Tracker
+    ├── LcdDriver
+    │   ├── Crystalfontz128x128_ST7735.c
+    │   ├── Crystalfontz128x128_ST7735.h
+    │   ├── HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.c
+    │   └── HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.h
+    ├── StepperLib
+    │   ├── base_stepper.c
+    │   ├── base_stepper.h
+    │   ├── top_stepper.c
+    │   └── top_stepper.h
+    ├── main.c
+    ├── msp432p401r.cmd
+    ├── startup_msp432p401r_ccs.c
+    ├── system_msp432p401r.c
+    └── targetConfigs
+        └── readme.txt
+```
+## Getting started
+1. Open the project in Code Composer Studio.
+2. On the Arm Compiler options add the source directory:
+   > *simplelink_msp432_sdk_3_40_01_02/*
+3. On the Arm Linker options, add the following path:
+   > *[...]/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/ccs/msp432p4xx_driverlib.lib*
+4. Build and run the project. In the Code Composer Studio console, the values detected by the photoresistors should be visible.
 
 ## Functionalities explanation
 Once the solar tracker structure is connected to power and the microcontroller is linked to the computer containing the project code, we compile and launch the code using Code Composer Studio.
@@ -52,14 +94,6 @@ The horizontal movement relies on the stepper motor located at the base and the 
 After all the preceding verifications and controls, the horizontal movement of the structure is executed until reaching the optimal position for light intensity.
 
 Once the horizontal movement of the arm is completed, we proceed with the vertical movement (if required) in a similar manner, but taking into consideration the variation of the values ​​of the photoresistors [?] and [?].
-
-## Getting started
-1. Open the project in Code Composer Studio.
-2. On the Arm Compiler options add the source directory:
-   > *simplelink_msp432_sdk_3_40_01_02/*
-3. On the Arm Linker options, add the following path:
-   > *[...]/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/ccs/msp432p4xx_driverlib.lib*
-4. Build and run the project. In the Code Composer Studio console, the values detected by the photoresistors should be visible.
 
 ## Team
 | Members        | Mail |
