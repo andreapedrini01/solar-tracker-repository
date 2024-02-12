@@ -83,16 +83,74 @@ git clone git@github.com:AirinLavis/iot-proj-es
 4. Build and run the project. In the Code Composer Studio console, the values detected by the photoresistors should be visible.
 
 ## Functionalities explanation
-Once the solar tracker structure is connected to power and the microcontroller is linked to the computer containing the project code, we compile and launch the code using Code Composer Studio.
+Once the solar tracker structure is connected to power and the microcontroller is linked to the computer containing the project's code, we compile and launch the code using Code Composer Studio. Then, it will be possible to observe the current values received by each of the four photoresistors.
 
-In the Code Composer Studio console, we can observe the current values received by each of the four photoresistors. Initially, the average light intensity received by the photoresistors is calculated. If this average surpasses a previously defined luminous threshold (LIGHT_THRESHOLD), the calculations for the horizontal movement of the motor are initiated.
+The following points denote the most important code sections that allow the visualization of data and configuration of the necessary components to enable the movement of the structure to make this an effective solar tracker.
 
-(*This part is subject to change*)
-The horizontal movement relies on the stepper motor located at the base and the difference between the values read by photoresistors [0] and [1]. If this difference is equal to or greater than another previously defined threshold (VALUE_CHANGE), the steps that the motor must take are calculated clockwise or counterclockwise and within defined limits (to prevent damage to other electrical components).
+#### Initialization of hardware _hwInit() and motors init_motors()
+```c
+void _hwInit()
+{
+    // Halting WDT and disabling master interrupts
+    WDT_A_holdTimer();
+    Interrupt_disableMaster();
+    init_motors();
+    _adcInit();
+}
+```
+This function is responsible for initializing the necessary hardware for the system's operation, such as the stepper motor, the ADC (Analog-to-Digital Converter), and any other required configurations.
 
-After all the preceding verifications and controls, the horizontal movement of the structure is executed until reaching the optimal position for light intensity.
+```c
+void init_motors() {
+    //base motor
+    init_baseStepper();
 
-Once the horizontal movement of the arm is completed, we proceed with the vertical movement (if required) in a similar manner, but taking into consideration the variation of the values ​​of the photoresistors [?] and [?].
+    //top motor
+    init_topStepper();
+}
+```
+The movement of the solar tracker is based on biaxial motion, so we initialize the base and top motors, which are responsible for horizontal and vertical movements, respectively.
+
+We observe the initialization of the base motor. For the vertical movement, the motor is initialized in a similar manner.
+
+```c
+void init_baseStepper() {
+    // Initialize the port and pin
+    MAP_WDT_A_holdTimer();
+
+    // Configure the pins as outputs
+    MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, BASE_STEP_PIN | BASE_DIR_PIN);
+
+   // Set pins to initial low level
+    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, BASE_STEP_PIN | BASE_DIR_PIN);
+}
+```
+Given that the microcontroller we are using is an MSP432P401R and it is highly configurable, a proper initialization of its peripherals is important for optimal operation.
+
+#### Initialization of ADC _adcInit()
+
+```c
+void _adcInit(){
+        /* Configures Pin 6.0 and 4.4 as ADC input */
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN2, GPIO_TERTIARY_MODULE_FUNCTION);
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN1, GPIO_TERTIARY_MODULE_FUNCTION);
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN0, GPIO_TERTIARY_MODULE_FUNCTION);
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN4, GPIO_TERTIARY_MODULE_FUNCTION);
+
+        /* Initializing ADC (ADCOSC/64/8) */
+        ADC14_enableModule();
+        ADC14_initModule(ADC_CLOCKSOURCE_ADCOSC, ADC_PREDIVIDER_64, ADC_DIVIDER_8, 0);
+
+...
+
+}
+
+```
+Extremely important function as it initializes the ADC (Analog-to-Digital Converter) and configures the pins 5.2, 5.1, 5.0 and 5.4 as ADC inputs without which it would be impossible to directly read the values of the photoresistors in digital form. The photoresistors provide an analog output that varies depending on the intensity of the incident light, and this analog signal must be converted to digital so that the microcontroller can interpret it.
+
+#### Read and Movement Functions
+
+
 
 ## Team
 | Members        | Mail |
