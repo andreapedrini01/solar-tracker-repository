@@ -46,10 +46,10 @@ git clone git@github.com:AirinLavis/iot-proj-es
    > *simplelink_msp432_sdk_3_40_01_02/*
 3. On the Arm Linker options, add the following path:
    > *[...]/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/ccs/msp432p4xx_driverlib.lib*
-4. Build and run the project. In the Code Composer Studio console, the values detected by the photoresistors should be visible.
+4. Build and run the project.
 
 ## Functionalities explanation
-Once the solar tracker structure is connected to power and the microcontroller is linked to the computer containing the project's code, we compile and launch the code using Code Composer Studio. Then, it will be possible to observe the current values received by each of the four photoresistors.
+Once the solar tracker structure is connected to power and the microcontroller is linked to the computer containing the project's code, we compile and launch the code using Code Composer Studio.
 
 The following points denote the most important code sections that allow the visualization of data and configuration of the necessary components to enable the movement of the structure to make this structure an effective solar tracker.
 
