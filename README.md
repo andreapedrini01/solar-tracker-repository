@@ -149,9 +149,9 @@ void _adcInit(){
 Extremely important function as it initializes the ADC (Analog-to-Digital Converter) and configures the pins 5.2, 5.1, 5.0 and 5.4 as ADC inputs without which it would be impossible to directly read the values of the photoresistors in digital form. The photoresistors provide an analog output that varies depending on the intensity of the incident light, and this analog signal must be converted to digital so that the microcontroller can interpret it.
 
 #### Read and Movement Functions
-The functions responsible for controlling both motors to move or not are **readAndMove()**, **horMov()**, and **verMov()**. Starting with the latter two, as they are nested within the **readAndMove()** function, we can say that they function almost analogously. The differences between them are mainly based on limitations of the movement that we have had to implement to prevent damage to the components, in the calculation of differences in sensor values, and finally in the obvious difference in the direction of movement.
+The functions responsible for controlling both motors to move or not are **readAndMove()**, **horMov()**, and **verMov()**. Starting with the latter two we can say that they function almost analogously. The differences between them are mainly based on limitations of the movement that we have had to implement to prevent damage to the components, in the calculation of differences in sensor values, and finally in the obvious difference in the direction of movement.
 
-We analyzing the operation of **horMov()**.
+We begin analyzing the operation of **horMov()**.
 
 ```c
 void horMov() {
@@ -216,6 +216,7 @@ Limits are applied to the motor steps to ensure safe movement within the establi
 ```
 
 #### Step restriction
+*Post a photo of the Solar Tracker and explain why it would be harmful for the arm to move in any direction.*
 
 #### Mapping of input values
 
