@@ -85,9 +85,9 @@ git clone git@github.com:AirinLavis/iot-proj-es
 ## Functionalities explanation
 Once the solar tracker structure is connected to power and the microcontroller is linked to the computer containing the project's code, we compile and launch the code using Code Composer Studio. Then, it will be possible to observe the current values received by each of the four photoresistors.
 
-The following points denote the most important code sections that allow the visualization of data and configuration of the necessary components to enable the movement of the structure to make this an effective solar tracker.
+The following points denote the most important code sections that allow the visualization of data and configuration of the necessary components to enable the movement of the structure to make this structure an effective solar tracker.
 
-#### Initialization of hardware _hwInit() and motors init_motors()
+#### Initialization of hardware and motors 
 ```c
 void _hwInit()
 {
@@ -127,7 +127,7 @@ void init_baseStepper() {
 ```
 Given that the microcontroller we are using is an MSP432P401R and it is highly configurable, a proper initialization of its peripherals is important for optimal operation.
 
-#### Initialization of ADC _adcInit()
+#### Initialization of ADC
 
 ```c
 void _adcInit(){
@@ -149,6 +149,10 @@ void _adcInit(){
 Extremely important function as it initializes the ADC (Analog-to-Digital Converter) and configures the pins 5.2, 5.1, 5.0 and 5.4 as ADC inputs without which it would be impossible to directly read the values of the photoresistors in digital form. The photoresistors provide an analog output that varies depending on the intensity of the incident light, and this analog signal must be converted to digital so that the microcontroller can interpret it.
 
 #### Read and Movement Functions
+
+#### Step restriction
+
+#### Mapping of input values
 
 
 
