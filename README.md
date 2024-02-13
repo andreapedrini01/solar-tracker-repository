@@ -6,7 +6,6 @@
   - [Hardware](#hardware)
   - [Software](#software)
 - [Installation](#installation)
-- [Folder structure](#folder-structure)
 - [Getting started](#getting-started)
 - [Functionalities explanation](#functionalities-explanation)
 - [Team](#team)
@@ -40,39 +39,6 @@ For this project, the following software is needed:
 Clone the repository
 ```
 git clone git@github.com:AirinLavis/iot-proj-es
-```
-
-## Folder structure
-```
-├── README.md
-├── SOLIDWORKS
-│   ├── 17HE15-1504S IMAGE.png
-│   ├── 17HE15-1504S.STEP
-│   ├── ARM IMAGE.png
-│   ├── ARM.SLDPRT
-│   ├── BRACKET IMAGE.png
-│   ├── BRACKET.SLDPRT
-│   ├── GEARBOX IMAGE.png
-│   ├── GEARBOX MG17-G100.STEP
-│   ├── LINK IMAGE.png
-│   └── LINK.SLDPRT
-└── Solar_Tracker
-    ├── LcdDriver
-    │   ├── Crystalfontz128x128_ST7735.c
-    │   ├── Crystalfontz128x128_ST7735.h
-    │   ├── HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.c
-    │   └── HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.h
-    ├── StepperLib
-    │   ├── base_stepper.c
-    │   ├── base_stepper.h
-    │   ├── top_stepper.c
-    │   └── top_stepper.h
-    ├── main.c
-    ├── msp432p401r.cmd
-    ├── startup_msp432p401r_ccs.c
-    ├── system_msp432p401r.c
-    └── targetConfigs
-        └── readme.txt
 ```
 ## Getting started
 1. Open the project in Code Composer Studio.
