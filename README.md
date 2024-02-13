@@ -1,7 +1,6 @@
 # Solar tracker
 <img src="https://www.soleosenergy.com/wp-content/uploads/2023/12/Double-axis-Solar-Trackers.png" align="right" width="180">
 
-
 ## Table of contents
 - [About the project](#about-the-project)
 - [Requirements](#requirements)
