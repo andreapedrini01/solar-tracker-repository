@@ -1,4 +1,6 @@
 # Solar tracker
+<img src="https://www.soleosenergy.com/wp-content/uploads/2023/12/Double-axis-Solar-Trackers.png" align="right" width="180">
+
 
 ## Table of contents
 - [About the project](#about-the-project)
@@ -21,6 +23,7 @@ Our goal for this solar tracker project is to implement it in the simplest way p
 ## Requirements
 #### Hardware
 The hardware required for this project is listed as follows:
+<img src="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.3.0/zephyr/_images/msp_exp432p401r_launchxl.jpg" align="right" width="180">
 - Texas Instruments MSP432P401R microcontroller
 - 2 Gearboxes
 - 2 Stepper motors
@@ -29,7 +32,8 @@ The hardware required for this project is listed as follows:
 - Jumper wires
 - Solar panel
 - Base and columns to assemble everything as a whole
-  
+
+
 #### Software
 For this project, the following software is needed:
 - Code Composer Studio as and IDE
