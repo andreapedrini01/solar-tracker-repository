@@ -115,12 +115,16 @@ void _adcInit(){
 }
 
 ```
-Extremely important function as it initializes the ADC (Analog-to-Digital Converter) and configures the pins 5.2, 5.1, 5.0 and 5.4 as ADC inputs without which it would be impossible to directly read the values of the photoresistors in digital form. The photoresistors provide an analog output that varies depending on the intensity of the incident light, and this analog signal must be converted to digital so that the microcontroller can interpret it.
+**_adcInit()** is an extremely important function as it initializes the ADC (Analog-to-Digital Converter) and configures the pins 5.2, 5.1, 5.0 and 5.4 of the microcontroller as ADC inputs without which it would be impossible to directly read the values of the photoresistors in digital form. The photoresistors provide an analog output that varies depending on the intensity of the incident light, and this analog signal must be converted to digital so that the microcontroller can interpret it.
 
 #### Read and Movement Functions
-The functions responsible for controlling both motors to move or not are **readAndMove()**, **horMov()**, and **verMov()**. Starting with the latter two we can say that they function almost analogously. The differences between them are mainly based on limitations of the movement that we have had to implement to prevent damage to the components, in the calculation of differences in sensor values, and finally in the obvious difference in the direction of movement.
+The functions responsible for controlling both motors to move or not are **readAndMove()**, **horMov()**, and **verMov()**. 
 
-We begin analyzing the operation of **horMov()**.
+In reality, these three functions differ in few aspects (ignoring the obvious difference between horMov() and verMov(), which differ in the orientation of the displacement) since, in practical terms, they accomplish the same task. However, the existence and invocation of each one of them depend on what needs to be tested.
+
+The utility of **readAndMove()** is that it first calculates the current position of both motors to eventually move them. Meanwhile, **horMov()** and **verMov()** allow reading the current position and moving the top motor only if the movement of the base motor has already finished.
+
+For the sake of practicality, we will break down the operation of **horMov()** for explanation.
 
 ```c
 void horMov() {
