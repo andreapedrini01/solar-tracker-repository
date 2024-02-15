@@ -117,6 +117,32 @@ void _adcInit(){
 ```
 `adcInit()` is an extremely important function as it initializes the ADC (Analog-to-Digital Converter) and configures the pins 5.2, 5.1, 5.0 and 5.4 of the microcontroller as ADC inputs without which it would be impossible to directly read the values of the photoresistors in digital form. The photoresistors provide an analog output that varies depending on the intensity of the incident light, and this analog signal must be converted to digital so that the microcontroller can interpret it.
 
+#### Mapping of input values
+The `map` function takes a value `x` and maps it from a range specified by the input (`in_min` to `in_max`) to a range specified by the output (`out_min` to `out_max`). The precision of the result can be specified through the `precision` parameter.
+
+```c
+int map(int x, int in_min, int in_max, int out_min, int out_max, int precision){
+    int top_part = (x - in_min) * (out_max - out_min);
+    int bottom_part = in_max - in_min;
+    return  (top_part / bottom_part) + out_min;
+}
+```
+
+ The `map` function allows mapping a value read from an analog sensor to a more manageable range. In our projects, it enables us to convert readings from photoresistors, which range from 0 to 16383 (2^14 - 1), into a range between 0 and 1023 (2^10 - 1), typical for analog values. This simplifies data management by adjusting the sensor's input range to match the processing and visualization capabilities of the system.
+
+```c
+int scaleReading(reading) {
+    return map(reading, 0, 16383, 0, 1023, 1);
+}
+```
+
+We also use the `map` function to map the obtained value into the range of arm movement.
+
+```c
+    map(diff1, -1023, 1023, -MAX_MOVIMENTO, MAX_MOVIMENTO, 100);
+```
+
+
 #### Read and Movement Functions
 The functions responsible for controlling both motors to move or not are `readAndMove()`, `horMov()`, and `verMov()`. 
 
@@ -214,7 +240,6 @@ Summarizing, these functions are essential for the operation of the stepper moto
 #### Step restriction
 *Post a photo of the Solar Tracker and explain why it would be harmful for the arm to move in any direction.*
 
-#### Mapping of input values
 
 
 
