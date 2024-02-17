@@ -1,7 +1,8 @@
 # Solar tracker
-<img src="https://www.soleosenergy.com/wp-content/uploads/2023/12/Double-axis-Solar-Trackers.png" align="right" width="180">
 
 ## Table of contents
+<img src="https://www.soleosenergy.com/wp-content/uploads/2023/12/Double-axis-Solar-Trackers.png" align="right" width="180">
+
 - [About the project](#about-the-project)
 - [Requirements](#requirements)
   - [Hardware](#hardware)
@@ -59,8 +60,7 @@ The following points denote the most important code sections that allow the visu
 #### Initialization of hardware and motors 
 Given that the microcontroller we are using is an MSP432P401R and it is highly configurable, a proper initialization of its peripherals is important for optimal operation.
 ```c
-void _hwInit()
-{
+void _hwInit(){
     // Halting WDT and disabling master interrupts
     WDT_A_holdTimer();
     Interrupt_disableMaster();
@@ -100,18 +100,16 @@ void init_baseStepper() {
 
 ```c
 void _adcInit(){
-        /* Configures Pin 6.0 and 4.4 as ADC input */
-        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN2, GPIO_TERTIARY_MODULE_FUNCTION);
-        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN1, GPIO_TERTIARY_MODULE_FUNCTION);
-        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN0, GPIO_TERTIARY_MODULE_FUNCTION);
-        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN4, GPIO_TERTIARY_MODULE_FUNCTION);
+    /* Configures Pin 6.0 and 4.4 as ADC input */
+    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN2, GPIO_TERTIARY_MODULE_FUNCTION);
+    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN1, GPIO_TERTIARY_MODULE_FUNCTION);
+    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN0, GPIO_TERTIARY_MODULE_FUNCTION);
+    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN4, GPIO_TERTIARY_MODULE_FUNCTION);
 
-        /* Initializing ADC (ADCOSC/64/8) */
-        ADC14_enableModule();
-        ADC14_initModule(ADC_CLOCKSOURCE_ADCOSC, ADC_PREDIVIDER_64, ADC_DIVIDER_8, 0);
-
+    /* Initializing ADC (ADCOSC/64/8) */
+    ADC14_enableModule();
+    ADC14_initModule(ADC_CLOCKSOURCE_ADCOSC, ADC_PREDIVIDER_64, ADC_DIVIDER_8, 0);
 ...
-
 }
 
 ```
@@ -139,7 +137,7 @@ int scaleReading(reading) {
 We also use the `map` function to map the obtained value into the range of arm movement.
 
 ```c
-    map(diff1, -1023, 1023, -MAX_MOVIMENTO, MAX_MOVIMENTO, 100);
+map(diff1, -1023, 1023, -MAX_MOVIMENTO, MAX_MOVIMENTO, 100);
 ```
 
 
@@ -154,55 +152,55 @@ For the sake of practicality, we will break down the operation of `horMov()` for
 
 ```c
 void horMov() {
-       int horizontalSteps = 0;
-       int diff1 = 0;
-       int diff1_1 = 0;
+    int horizontalSteps = 0;
+    int diff1 = 0;
+    int diff1_1 = 0;
 
-      /* Store ADC14 conversion results */
-           resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
-           resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
-           resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
-           resultsBuffer[3] = ADC14_getResult(ADC_MEM3);
+    /* Store ADC14 conversion results */
+    resultsBuffer[0] = ADC14_getResult(ADC_MEM0);
+    resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
+    resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
+    resultsBuffer[3] = ADC14_getResult(ADC_MEM3);
 ...
 ```
 First, the values of the four light sensors are read and stored in the **resultsBuffer** array. These values represent the intensity of light received by each sensor. Subsequently, the average intensity of light is calculated from the sensor values. This average is used later to make decisions about the movement of the panel.
 
 ```c
 ...
-       int avgIntensity = 0;
-       int i=0;
-       for (i = 0; i < NUM_SENSORS; i++) {
-           avgIntensity += resultsBuffer[i];
-       }
-       avgIntensity /= NUM_SENSORS;
+    int avgIntensity = 0;
+    int i=0;
+    for (i = 0; i < NUM_SENSORS; i++) {
+        avgIntensity += resultsBuffer[i];
+    }
+    avgIntensity /= NUM_SENSORS;
 ...
 ```
 To detect changes in the intensity of incident light, the differences between the values of horizontally opposite sensors are calculated to determine if there has been a significant change in this intensity.
 ```c
 ...
-if (avgIntensity > LIGHT_THRESHOLD) {
-           diff1 = resultsBuffer[0] - resultsBuffer[1];
-           diff1_1 = resultsBuffer[3] - resultsBuffer[2];
+    if (avgIntensity > LIGHT_THRESHOLD) {
+        diff1 = resultsBuffer[0] - resultsBuffer[1];
+        diff1_1 = resultsBuffer[3] - resultsBuffer[2];
 ...
 ```
 If a significant change in the intensity of light is detected, this change is mapped to motor steps. This involves converting the intensity difference into a specific number of steps that the motor must perform.
 ```c
 ...
-if (abs(diff1) >= VALUE_CHANGE) {
-                      horizontalSteps = map(diff1, -16383, 16383, -10000, 10000);
-           } else if (abs(diff1_1) >= VALUE_CHANGE)
-                      horizontalSteps = map(diff1_1, -16383, 16383, -10000, 10000);
+        if (abs(diff1) >= VALUE_CHANGE) {
+            horizontalSteps = map(diff1, -16383, 16383, -10000, 10000);
+        } else if (abs(diff1_1) >= VALUE_CHANGE)
+            horizontalSteps = map(diff1_1, -16383, 16383, -10000, 10000);
 ...
 ```
 Limits are applied to the motor steps to ensure safe movement within the established range. Then, pulses are sent to the base motor to move the solar panel in the appropriate horizontal direction.
 ```c
 ...
-           if (horizontalSteps != 0) {
-              horizontalSteps = limitSteps(base_position,horizontalSteps);
-              base_position += horizontalSteps;
-              moveBase(horizontalSteps);
-          }
-       }
+        if (horizontalSteps != 0) {
+            horizontalSteps = limitSteps(base_position,horizontalSteps);
+            base_position += horizontalSteps;
+            moveBase(horizontalSteps);
+        }
+    }
 }
 ```
 However, before concluding the breakdown of this function, we encounter the invocation of `moveBase()`, which indeed is responsible for the operation of the motor at the logical-mathematical level. The `moveBase()` function, along with other directly related functions, is found in the *StepperLib* library, where we can also find functions responsible for the top motor.
@@ -210,9 +208,9 @@ However, before concluding the breakdown of this function, we encounter the invo
 The function below (which is within the definition of the library) sends a single pulse to the control pin of the base motor. Each motor pulse produces a small angular movement. These pulses are essential for the motor to advance or reverse one step at a time. The duration of the pulse and the delay between pulses can be adjusted to control the speed and smoothness of the motor's movement.
 ```c
 void stepBaseMotor() {
-        MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, BASE_STEP_PIN);
-        __delay_cycles(5000); 
-        MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, BASE_STEP_PIN);
+    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, BASE_STEP_PIN);
+    __delay_cycles(5000); 
+    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, BASE_STEP_PIN);
 }
 ```
 Finally, referring to `moveBase()`, it controls the direction of movement of the base motor and the number of steps it should take. Depending on the "steps" parameter, the motor will move forward or backward. The steps are generated using the `stepBaseMotor()` function in a for loop. This ensures that the base motor moves exactly the specified number of steps.
