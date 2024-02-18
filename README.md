@@ -52,6 +52,22 @@ git clone git@github.com:AirinLavis/iot-proj-es
    > *[...]/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/ccs/msp432p4xx_driverlib.lib*
 4. Build and run the project.
 
+## Circuit scheme
+
+## Pin scheme 
+|Pin|Description|
+|--|--|
+|GND|xx|
+|5V|xx|
+|P1.6|STEP Pin Base stepper|
+|P1.7|DIR Pin Base stepper|
+|P2.5|DIR Pin Base stepper|
+|P2.6|STEP Pin Top stepper|
+|P5.0|Photoresistor (Red)|
+|P5.1|Photoresistor (Green)|
+|P5.2|Photoresistor (Black)|
+|P5.4|Photoresistor (Blue)|
+
 ## Functionalities explanation
 Once the solar tracker structure is connected to power and the microcontroller is linked to the computer containing the project's code, we compile and launch the code using Code Composer Studio.
 
