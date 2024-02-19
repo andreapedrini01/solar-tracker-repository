@@ -9,6 +9,7 @@
 - [Installation](#installation)
 - [Getting started](#getting-started)
 - [Functionalities explanation](#functionalities-explanation)
+- [Known Issues](#known-issues)
 - [Team](#team)
 
 ## About the project
