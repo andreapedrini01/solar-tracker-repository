@@ -38,12 +38,27 @@ The hardware required for this project is listed as follows:
 For this project, the following software is needed:
 - Code Composer Studio as IDE
 - Solidworks (For the design of the containing structure)
-  
-### Installation
+
+## Pin scheme
+|Pin|Description|
+|--|--|
+|GND|xx|
+|5V|xx|
+|P1.6|STEP Pin Base stepper|
+|P1.7|DIR Pin Base stepper|
+|P2.5|DIR Pin Base stepper|
+|P2.6|STEP Pin Top stepper|
+|P5.0|Photoresistor (Red)|
+|P5.1|Photoresistor (Green)|
+|P5.2|Photoresistor (Black)|
+|P5.4|Photoresistor (Blue)|
+
+## Installation
 Clone the repository
 ```
 git clone https://github.com/andreapedrini01/solar-tracker-repository.git
 ```
+
 ## Getting started
 1. Open the project in Code Composer Studio.
 2. On the Arm Compiler options add the source directory:
