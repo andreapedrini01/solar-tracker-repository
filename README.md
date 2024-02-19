@@ -211,13 +211,6 @@ void moveBase(int steps) {
 ```
 Summarizing, these functions are essential for the operation of the stepper motors. They provide the precise control needed to move the solar panels in the correct direction and distance to maximize solar energy capture. Without proper control of the motor steps, solar tracking would not be possible.
 
-#### Step restriction
-*Post a photo of the Solar Tracker and explain why it would be harmful for the arm to move in any direction.*
-
-#### Mapping of input values
-
-
-
 ## Team
 | Members        | Mail |
 |--|--|
