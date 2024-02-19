@@ -1,4 +1,5 @@
 # Solar tracker
+<img src="https://www.soleosenergy.com/wp-content/uploads/2023/12/Double-axis-Solar-Trackers.png" align="right" width="180">
 
 ## Table of contents
 - [About the project](#about-the-project)
@@ -21,24 +22,26 @@ Our goal for this solar tracker project is to implement it in the simplest way p
 ## Requirements
 #### Hardware
 The hardware required for this project is listed as follows:
+<img src="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.3.0/zephyr/_images/msp_exp432p401r_launchxl.jpg" align="right" width="180">
 - Texas Instruments MSP432P401R microcontroller
-- 2 Gearboxes
-- 2 Stepper motors
-- 4 Photoresistor
-- Current-limiting resistor
+- 2 Gearboxes MG17-G100
+- 2 Stepper motors NEMA 17HE15-1504S
+- 4 Photoresistor GL5516
+- 10 kΩ Current-limiting resistors
 - Jumper wires
-- Solar panel
-- Base and columns to assemble everything as a whole
-  
+- 10 Solar panels 6V, 50mA
+- Structure to assemble everything as a whole
+
+
 #### Software
 For this project, the following software is needed:
-- Code Composer Studio as and IDE
+- Code Composer Studio as IDE
 - Solidworks (For the design of the containing structure)
   
 ### Installation
 Clone the repository
 ```
-git clone git@github.com:AirinLavis/iot-proj-es
+git clone https://github.com/andreapedrini01/solar-tracker-repository.git
 ```
 ## Getting started
 1. Open the project in Code Composer Studio.
@@ -112,16 +115,20 @@ void _adcInit(){
 }
 
 ```
-Extremely important function as it initializes the ADC (Analog-to-Digital Converter) and configures the pins 5.2, 5.1, 5.0 and 5.4 as ADC inputs without which it would be impossible to directly read the values of the photoresistors in digital form. The photoresistors provide an analog output that varies depending on the intensity of the incident light, and this analog signal must be converted to digital so that the microcontroller can interpret it.
+`adcInit()` is an extremely important function as it initializes the ADC (Analog-to-Digital Converter) and configures the pins 5.2, 5.1, 5.0 and 5.4 of the microcontroller as ADC inputs without which it would be impossible to directly read the values of the photoresistors in digital form. The photoresistors provide an analog output that varies depending on the intensity of the incident light, and this analog signal must be converted to digital so that the microcontroller can interpret it.
 
 #### Read and Movement Functions
-The functions responsible for controlling both motors to move or not are **readAndMove()**, **horMov()**, and **verMov()**. Starting with the latter two we can say that they function almost analogously. The differences between them are mainly based on limitations of the movement that we have had to implement to prevent damage to the components, in the calculation of differences in sensor values, and finally in the obvious difference in the direction of movement.
+The functions responsible for controlling both motors to move or not are `readAndMove()`, `horMov()`, and `verMov()`. 
 
-We begin analyzing the operation of **horMov()**.
+In reality, these three functions differ in few aspects (ignoring the obvious difference between `horMov()` and `verMov()`, which differ in the orientation of the displacement) since, in practical terms, they accomplish the same task. However, the existence and invocation of each one of them depend on what needs to be tested.
+
+The utility of `readAndMove()` is that it first calculates the current position of both motors to eventually move them. Meanwhile, `horMov()` and `verMov()` allow reading the current position and moving the top motor only if the movement of the base motor has already finished.
+
+For the sake of practicality, we will break down the operation of `horMov()` for explanation.
 
 ```c
 void horMov() {
-    int horizontalSteps = 0;
+       int horizontalSteps = 0;
        int diff1 = 0;
        int diff1_1 = 0;
 
@@ -130,18 +137,13 @@ void horMov() {
            resultsBuffer[1] = ADC14_getResult(ADC_MEM1);
            resultsBuffer[2] = ADC14_getResult(ADC_MEM2);
            resultsBuffer[3] = ADC14_getResult(ADC_MEM3);
-
-             printf("PR0: %5d\n", resultsBuffer[0]);
-             printf("PR1: %5d\n", resultsBuffer[1]);
-             printf("PR2: %5d\n", resultsBuffer[2]);
-             printf("PR3: %5d\n\n", resultsBuffer[3]);
 ...
 ```
-First, the values of the four light sensors are read and stored in the **resultsBuffer** array. These values represent the intensity of light received by each sensor. Subsequently, the average intensity of light is calculated from the sensor values. This average is used later to make decisions about the movement of the panel.
+First, the values of the four light sensors are read and stored in the `resultsBuffer[]` array. These values represent the intensity of light received by each sensor. Subsequently, the average intensity of light is calculated from the sensor values. This average is used later to make decisions about the movement of the panel.
 
 ```c
 ...
-int avgIntensity = 0;
+       int avgIntensity = 0;
        int i=0;
        for (i = 0; i < NUM_SENSORS; i++) {
            avgIntensity += resultsBuffer[i];
@@ -155,17 +157,15 @@ To detect changes in the intensity of incident light, the differences between th
 if (avgIntensity > LIGHT_THRESHOLD) {
            diff1 = resultsBuffer[0] - resultsBuffer[1];
            diff1_1 = resultsBuffer[3] - resultsBuffer[2];
-           printf("diff1 = %d\n", diff1);
-           printf("diff1_1 = %d\n", diff1_1);
 ...
 ```
 If a significant change in the intensity of light is detected, this change is mapped to motor steps. This involves converting the intensity difference into a specific number of steps that the motor must perform.
 ```c
 ...
 if (abs(diff1) >= VALUE_CHANGE) {
-                      horizontalSteps = map(diff1, -16383, 16383, -10000, 10000);
-           } else if (abs(diff1_1) >= VALUE_CHANGE)
-                      horizontalSteps = map(diff1_1, -16383, 16383, -10000, 10000);
+    horizontalSteps = map(diff1, -16383, 16383, -10000, 10000);
+} else if (abs(diff1_1) >= VALUE_CHANGE)
+    horizontalSteps = map(diff1_1, -16383, 16383, -10000, 10000);
 ...
 ```
 Limits are applied to the motor steps to ensure safe movement within the established range. Then, pulses are sent to the base motor to move the solar panel in the appropriate horizontal direction.
@@ -173,20 +173,47 @@ Limits are applied to the motor steps to ensure safe movement within the establi
 ...
            if (horizontalSteps != 0) {
               horizontalSteps = limitSteps(base_position,horizontalSteps);
-              printf("horizontalSteps after limiting = %d\n", horizontalSteps);
               base_position += horizontalSteps;
               moveBase(horizontalSteps);
           }
        }
 }
 ```
+However, before concluding the breakdown of this function, we encounter the invocation of `moveBase()`, which indeed is responsible for the operation of the motor at the logical-mathematical level. The `moveBase()` function, along with other directly related functions, is found in the *StepperLib* library, where we can also find functions responsible for the top motor.
 
-#### Step restriction
-*Post a photo of the Solar Tracker and explain why it would be harmful for the arm to move in any direction.*
+The function below (which is within the definition of the library) sends a single pulse to the control pin of the base motor. Each motor pulse produces a small angular movement. These pulses are essential for the motor to advance or reverse one step at a time. The duration of the pulse and the delay between pulses can be adjusted to control the speed and smoothness of the motor's movement.
+```c
+void stepBaseMotor() {
+        MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, BASE_STEP_PIN);
+        __delay_cycles(5000); 
+        MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, BASE_STEP_PIN);
+}
+```
+Finally, referring to `moveBase()`, it controls the direction of movement of the base motor and the number of steps it should take. Depending on the "steps" parameter, the motor will move forward or backward. The steps are generated using the `stepBaseMotor()` function in a for loop. This ensures that the base motor moves exactly the specified number of steps.
 
-#### Mapping of input values
+```c
+void moveBase(int steps) {
+    if (steps > 0) {
+        // moveBaseForward
+        MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, BASE_DIR_PIN);
+    } else {
+        // moveBaseBackward
+        steps = 0 - steps;
+        MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, BASE_DIR_PIN);
+    }
+    // Generate steps
+    int i;
+    for (i = 0; i < steps; i++) {
+        stepBaseMotor();
+        __delay_cycles(250); 
+    }
+}
+```
+Summarizing, these functions are essential for the operation of the stepper motors. They provide the precise control needed to move the solar panels in the correct direction and distance to maximize solar energy capture. Without proper control of the motor steps, solar tracking would not be possible.
 
-
+## Known Issues
+- Jumper impedance
+- Multiple reading in one cycle
 
 ## Team
 | Members        | Mail |
