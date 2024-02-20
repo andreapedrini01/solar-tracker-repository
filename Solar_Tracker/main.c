@@ -2,10 +2,7 @@
 #include <ti/devices/msp432p4xx/inc/msp.h>
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <ti/grlib/grlib.h>
-#include "LcdDriver/Crystalfontz128x128_ST7735.h"
-#include "LcdDriver/HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.h"
 #include <stdio.h>
-#include <string.h>
 #include <StepperLib/base_stepper.h>
 #include <stepperLib/top_stepper.h>
 
@@ -275,7 +272,7 @@ void main(void) {
 
            }
     } else {
-        int fullMovementCompleted = 0;
+        int fullMovementCompleted = 1;
         while(1){
                 // ADC_MEM1 conversion completed
                 if(!ADC_INT1)
