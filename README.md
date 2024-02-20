@@ -228,9 +228,18 @@ void moveBase(int steps) {
 Summarizing, these functions are essential for the operation of the stepper motors. They provide the precise control needed to move the solar panels in the correct direction and distance to maximize solar energy capture. Without proper control of the motor steps, solar tracking would not be possible.
 
 ## Known Issues
-- Jumper impedance
-- Multiple reading in one cycle
+#### Jumper impedance
+The issue with jumper impedance arises due to the use of jumper wires, which might introduce resistance and affect the accuracy of sensor readings or the performance of the motors. This impedance can lead to voltage drops and signal distortions, especially over long distances or in the presence of electromagnetic interference. To mitigate this issue, we could consider the following improvements:
 
+- Use of Shielded Cables: Replace jumper wires with shielded cables to minimize interference from external sources.
+- Shorter Wire Lengths: Keep the length of wires as short as possible to reduce resistance and signal degradation.
+
+#### Multiple reading in one cycle
+The issue of multiple readings in one cycle can occur when the code is not properly synchronized with the sampling rate of the ADC. This can lead to inaccurate readings or redundant calculations, affecting the overall performance of the solar tracker. To address this issue, we could implement the following improvements:
+
+- Synchronization with ADC Conversion: Ensure that the code waits for the completion of each ADC conversion before initiating another reading. This can be achieved by using interrupts to synchronize the code with the ADC sampling rate.
+- Error Handling: Implement error handling mechanisms to detect and handle cases where multiple readings occur unexpectedly, ensuring the reliability and robustness of the system.
+  
 ## Team
 | Members        | Mail |
 |--|--|
